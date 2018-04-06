@@ -20,18 +20,14 @@ int main(int argc, char **argv) {
     }
  
     char *msg = argv[1];
+    //The strlen function returns the length of the string in bytes.
     size_t len = strlen(msg);
  
     printf("Message: %s\n", argv[1]);
-    printf("Message length: %zu\n", len);
-    // benchmark
-    //int i;
-    //for (i = 0; i < 33554432; i++) {
+    printf("Message bit length: %zu\n", len*8);
 
-        md5(msg, len);
-    //}
+    md5(msg, len);
     
- 
     //var char digest[16] := h0 append h1 append h2 append h3 //(Output is in little-endian)
     uint8_t *p;
  
@@ -50,7 +46,6 @@ int main(int argc, char **argv) {
     printf("%2.2x%2.2x%2.2x%2.2x", p[0], p[1], p[2], p[3]);
     puts("");
  
-
     return 0;
 }
 
@@ -59,42 +54,39 @@ void md5(uint8_t *initial_msg, size_t initial_len) {
  
     // Message (to prepare)
     uint8_t *msg = NULL;
-
-    // Pre-processing: adding a single 1 bit
-    //append "1" bit to message    
-    /* Notice: the input bytes are considered as bits strings,
-       where the first bit is the most significant bit of the byte.[37] */
- 
-    // Pre-processing: padding with zeros
+    
+    // Padding process:
+    //append "1" bit to message 
     //append "0" bit until message length in bit ≡ 448 (mod 512)
-    //append length mod (2 pow 64) to message
+    //append length mod (2^64) to message
 
     int new_len;
     for(new_len = initial_len*8 + 1; new_len%512!=448; new_len++);
-    new_len /= 8;
-
-
+    printf("Setting new lenght to %d\n", new_len + 64);
     
-    msg = calloc(new_len + 64, 1); // also appends "0" bits 
-                                   // (we alloc also 64 extra bytes...)
+    new_len /=8;
+
+    //Allocating the necessary bytes for new_len and 64-bit representation of the initial_len  
+    msg = calloc(new_len + 8, 1);  
+
+    // Copy initial_len bytes from initial_msg memory area to msg memory area                               
     memcpy(msg, initial_msg, initial_len);
     msg[initial_len] = 128; // write the "1" bit
 
+    uint64_t bits_len = 8*initial_len;              
+    memcpy(msg + new_len, &bits_len, 8);           //  append 8 bytes representing the 64-bit representation of initial_msg
+ 
 
- 
-    uint32_t bits_len = 8*initial_len; // note, we append the len
-    memcpy(msg + new_len, &bits_len, 4);           // in bits at the end of the buffer
- 
     // Note: All variables are unsigned 32 bit and wrap modulo 2^32 when calculating
     // r specifies the per-round shift amounts
  
-    uint32_t r[] = {7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
+    uint32_t r[64] = {7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
                     5,  9, 14, 20, 5,  9, 14, 20, 5,  9, 14, 20, 5,  9, 14, 20,
                     4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
                     6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21};
 
     // Use binary integer part of the sines of integers (in radians) as constants// Initialize variables:
-    uint32_t k[] = {
+    uint32_t k[64] = {
         0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
         0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
         0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be,
@@ -116,10 +108,7 @@ void md5(uint8_t *initial_msg, size_t initial_len) {
     h1 = 0xefcdab89;
     h2 = 0x98badcfe;
     h3 = 0x10325476;
- 
-    
-    
-    
+
  
     // Process the message in successive 512-bit chunks:
     //for each 512-bit chunk of message:
@@ -161,8 +150,6 @@ void md5(uint8_t *initial_msg, size_t initial_len) {
             //printf("%2.2x%2.2x%2.2x%2.2x", p[0], p[1], p[2], p[3]);
             //puts("");
               
-
- 
             uint32_t f, g;
  
              if (i < 16) {
@@ -189,8 +176,7 @@ void md5(uint8_t *initial_msg, size_t initial_len) {
             //printf("%x", w[g]);
             b = b + LEFTROTATE((a + f + k[i] + w[g]), r[i]);
             a = temp;
-                        
-
+                    
 
  
         }
