@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
     size_t len = strlen(msg);
  
     printf("Message: %s\n", argv[1]);
-    printf("Message bit length: %zu\n", len*8);
+    printf("Message bit length: %zu bits\n", len*8);
 
     md5(msg, len);
     
@@ -57,12 +57,13 @@ void md5(uint8_t *initial_msg, size_t initial_len) {
     
     // Padding process:
     //append "1" bit to message 
-    //append "0" bit until message length in bit ≡ 448 (mod 512)
+    //append "0" bit until message bit-lenght ≡ 448 (mod 512)
     //append length mod (2^64) to message
 
     int new_len;
     for(new_len = initial_len*8 + 1; new_len%512!=448; new_len++);
-    printf("Setting new lenght to %d\n", new_len + 64);
+    printf("Padded message lenght %d bits\n", new_len + 64);
+    printf("Number of blocks: %d\n", (new_len + 64)/512);
     
     new_len /=8;
 
