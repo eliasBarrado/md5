@@ -23,8 +23,8 @@ int main(int argc, char **argv) {
     //The strlen function returns the length of the string in bytes.
     size_t len = strlen(msg);
  
-    printf("Message: %s\n", argv[1]);
-    printf("Message bit length: %zu bits\n", len*8);
+    printf("\nMessage: %s\n", argv[1]);
+    printf("Message length: %zu bits\n", len*8);
 
     md5(msg, len);
     
@@ -62,8 +62,8 @@ void md5(uint8_t *initial_msg, size_t initial_len) {
 
     int new_len;
     for(new_len = initial_len*8 + 1; new_len%512!=448; new_len++);
-    printf("Padded message lenght %d bits\n", new_len + 64);
-    printf("Number of blocks: %d\n", (new_len + 64)/512);
+    printf("Padded message lenght: %d bits\n", new_len + 64);
+    printf("Number of blocks: %d\n\n", (new_len + 64)/512);
     
     new_len /=8;
 
@@ -114,16 +114,10 @@ void md5(uint8_t *initial_msg, size_t initial_len) {
     // Process the message in successive 512-bit chunks:
     //for each 512-bit chunk of message:
     int offset;
-    for(offset=0; offset<new_len; offset += 64) {
+    for(offset=0; offset<new_len*8; offset += 512) {
  
-        // break chunk into sixteen 32-bit words w[j], 0 ≤ j ≤ 15
+        // Each w[j] represents a 32-bit word of the chunk, 0 ≤ j ≤ 15
         uint32_t *w = (uint32_t *) (msg + offset);
-    
-        //printf("offset: %d %x\n", offset, offset);
- 
-        int j;
-        //for(j =0; j < 64; j++) printf("%x ", ((uint8_t *) w)[j]);
-        //puts("");
  
         // Initialize hash value for this chunk:
         uint32_t a = h0;
@@ -135,22 +129,23 @@ void md5(uint8_t *initial_msg, size_t initial_len) {
         uint32_t i;
         for(i = 0; i<64; i++) {
 
-        
+
+            // prints the intermediate 4 words in hexadecimal format
             uint8_t *p;
-            //printf("%2.2i: ", i);
+            printf("%2.2i: ", i);
             p=(uint8_t *)&a;
-            //printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3]);
+            printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3]);
          
             p=(uint8_t *)&b;
-            //printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3]);
+            printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3]);
          
             p=(uint8_t *)&c;
-            //printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3]);
+            printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3]);
          
             p=(uint8_t *)&d;
-            //printf("%2.2x%2.2x%2.2x%2.2x", p[0], p[1], p[2], p[3]);
-            //puts("");
-              
+            printf("%2.2x%2.2x%2.2x%2.2x", p[0], p[1], p[2], p[3]);
+            puts("");
+            
             uint32_t f, g;
  
              if (i < 16) {
@@ -166,24 +161,18 @@ void md5(uint8_t *initial_msg, size_t initial_len) {
                 f = c ^ (b | (~d));
                 g = (7*i) % 16;
             }
-
-        
-            //printf("f=%x g=%d w[g]=%x\n", f, g, w[g]);
             
             uint32_t temp = d;
             d = c;
             c = b;
-            //printf("rotateLeft(%x + %x + %x + %x, %d)\n", a, f, k[i], w[g], r[i]);
-            //printf("%x", w[g]);
             b = b + LEFTROTATE((a + f + k[i] + w[g]), r[i]);
             a = temp;
                     
 
  
         }
-        
-        // Add this chunk's hash to result so far:
- 
+
+        // Update 4 hash words
         h0 += a;
         h1 += b;
         h2 += c;
@@ -191,7 +180,6 @@ void md5(uint8_t *initial_msg, size_t initial_len) {
  
     }
  
-    // cleanup
     free(msg);
  
 }
