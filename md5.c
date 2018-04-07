@@ -6,9 +6,9 @@
 // leftrotate function definition
 #define LEFTROTATE(x, c) (((x) << (c)) | ((x) >> (32 - (c))))
 
-void md5( uint8_t *, size_t);
+void md5( uint8_t*, size_t);
+void md5compress(uint32_t*, uint32_t*, uint32_t*, uint32_t*, uint32_t*, uint32_t*, uint32_t*);
 
- 
 // These vars will contain the hash
 uint32_t h0, h1, h2, h3;
  
@@ -28,11 +28,11 @@ int main(int argc, char **argv) {
 
     md5(msg, len);
     
-    //var char digest[16] := h0 append h1 append h2 append h3 //(Output is in little-endian)
-    uint8_t *p;
- 
-    // display result
- 
+    // Output is in little-endian
+    // Printing the concatenation of the 4 32-bits words h0, h1, h2,h3
+    printf("MD5 hash value: \n");
+
+    uint8_t *p; 
     p=(uint8_t *)&h0;
     printf("%2.2x%2.2x%2.2x%2.2x", p[0], p[1], p[2], p[3]);
  
@@ -44,14 +44,14 @@ int main(int argc, char **argv) {
  
     p=(uint8_t *)&h3;
     printf("%2.2x%2.2x%2.2x%2.2x", p[0], p[1], p[2], p[3]);
-    puts("");
+    printf("\n\n");
  
     return 0;
 }
 
 
 void md5(uint8_t *initial_msg, size_t initial_len) {
- 
+
     // Message (to prepare)
     uint8_t *msg = NULL;
     
@@ -111,75 +111,73 @@ void md5(uint8_t *initial_msg, size_t initial_len) {
     h3 = 0x10325476;
 
  
-    // Process the message in successive 512-bit chunks:
-    //for each 512-bit chunk of message:
+    // Apply md5compress to each 512-bit block
     int offset;
     for(offset=0; offset<new_len*8; offset += 512) {
  
         // Each w[j] represents a 32-bit word of the chunk, 0 ≤ j ≤ 15
         uint32_t *w = (uint32_t *) (msg + offset);
- 
-        // Initialize hash value for this chunk:
-        uint32_t a = h0;
-        uint32_t b = h1;
-        uint32_t c = h2;
-        uint32_t d = h3;
-
-        // Main loop:
-        uint32_t i;
-        for(i = 0; i<64; i++) {
-
-
-            // prints the intermediate 4 words in hexadecimal format
-            uint8_t *p;
-            printf("%2.2i: ", i);
-            p=(uint8_t *)&a;
-            printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3]);
-         
-            p=(uint8_t *)&b;
-            printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3]);
-         
-            p=(uint8_t *)&c;
-            printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3]);
-         
-            p=(uint8_t *)&d;
-            printf("%2.2x%2.2x%2.2x%2.2x", p[0], p[1], p[2], p[3]);
-            puts("");
-            
-            uint32_t f, g;
- 
-             if (i < 16) {
-                f = (b & c) | ((~b) & d);
-                g = i;
-            } else if (i < 32) {
-                f = (d & b) | ((~d) & c);
-                g = (5*i + 1) % 16;
-            } else if (i < 48) {
-                f = b ^ c ^ d;
-                g = (3*i + 5) % 16;          
-            } else {
-                f = c ^ (b | (~d));
-                g = (7*i) % 16;
-            }
-            
-            uint32_t temp = d;
-            d = c;
-            c = b;
-            b = b + LEFTROTATE((a + f + k[i] + w[g]), r[i]);
-            a = temp;
-                    
-
- 
-        }
-
-        // Update 4 hash words
-        h0 += a;
-        h1 += b;
-        h2 += c;
-        h3 += d;
- 
+        md5compress(&h0, &h1, &h2, &h3, r, k, w);
     }
  
     free(msg);
- 
+}
+
+void md5compress(uint32_t *h0, uint32_t *h1, uint32_t *h2, uint32_t *h3, uint32_t *r, uint32_t *k, uint32_t *w){
+
+    // Initialize hash value for this chunk:
+    uint32_t a = *h0;
+    uint32_t b = *h1;
+    uint32_t c = *h2;
+    uint32_t d = *h3;
+
+    // Main loop:
+    uint32_t i;
+    for(i = 0; i<64; i++) {
+
+        // prints the intermediate 4 words in hexadecimal format
+        uint8_t *p;
+        printf("%2.2i: ", i);
+        p=(uint8_t *)&a;
+        printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3]);
+     
+        p=(uint8_t *)&b;
+        printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3]);
+     
+        p=(uint8_t *)&c;
+        printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3]);
+     
+        p=(uint8_t *)&d;
+        printf("%2.2x%2.2x%2.2x%2.2x", p[0], p[1], p[2], p[3]);
+        puts("");
+        
+        uint32_t f, g;
+
+         if (i < 16) {
+            f = (b & c) | ((~b) & d);
+            g = i;
+        } else if (i < 32) {
+            f = (d & b) | ((~d) & c);
+            g = (5*i + 1) % 16;
+        } else if (i < 48) {
+            f = b ^ c ^ d;
+            g = (3*i + 5) % 16;          
+        } else {
+            f = c ^ (b | (~d));
+            g = (7*i) % 16;
+        }
+        
+        uint32_t temp = d;
+        d = c;
+        c = b;
+        b = b + LEFTROTATE((a + f + k[i] + w[g]), r[i]);
+        a = temp;
+    }
+    printf("\n");
+
+    // Update 4 hash words
+    *h0 += a;
+    *h1 += b;
+    *h2 += c;
+    *h3 += d;  
 }
