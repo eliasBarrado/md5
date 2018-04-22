@@ -77,7 +77,7 @@ uint32_t IV4=0x10325476;
 
 int block(void){
 
-	uint32_t Q[65], m[16] , QM0, QM1, QM2, QM3;
+	uint32_t Q[65], Q1[61] m[16] , QM0, QM1, QM2, QM3;
 
 
 	//Initialization vectors
@@ -101,13 +101,16 @@ int block(void){
 	    i = i +1;
 
 		// Q[1]  = .... .... .... .... .... .... .... .... 
-	    Q[1]  = frandom();
+	    Q [1]  = frandom();
+	    Q1[1]  = Q[1];
 
 	    // Q[2]  = .... .... .... .... .... .... .... .... 
-	    Q[2]  = frandom();
+	    Q [2]  = frandom();
+	    Q1[2]  = Q[2];
 
 	    // Q[3]  = .... .... .... 0... .... 0... .... ....
-	    Q[3]  = frandom() & 0xfff7f7ff;
+	    Q [3]  = frandom() & 0xfff7f7ff;
+	    Q1[3] = Q[3];
 
 	    // Q[4]  = 1... .... 0^^^ 1^^^ ^^^^ 1^^^ ^... .... 
 	    Q[4]  = (frandom() & 0x7f00007f) + 0x80080800 + (Q[3] & 0x0077f780);
@@ -206,7 +209,7 @@ int block(void){
 
 	    // No conditions for Q[25]...Q[47
 
-	    
+
 
 
 	    printf("Found ya\n");
