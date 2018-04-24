@@ -15,6 +15,7 @@
 
 #define DEBUG 1
 
+// Round functions F,G,H,I of the md5 compression function
 uint32_t FF(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint32_t s, uint32_t ac){
  	a = F(b,c,d) + a + x + ac;
  	a = RL(a,s);
@@ -52,6 +53,7 @@ const uint32_t mask_bit[33] = { 0x0,
 
 
 // Prints binary representation of uint_32_t
+// Only used for debug
 void print_bin(uint32_t hex){
 	int bin[32];
 	for (int i=32; i>0; i--) {
@@ -67,18 +69,16 @@ void print_bin(uint32_t hex){
 	for (int i=32; i>0; i--) {
 		printf("%d", bin[i-1]);
 		k++;
-		if(k%4 == 0 && k!=0){
+		// adds space between 4 consecutive digits 
+		if(k%4 == 0 && k!=0)
 			printf(" ");
-		}
-		
-
 	}
 	printf("\n");
 }
 
 
 // Prints ∆Q[i] = (X'[i] - X[i]) for i = 0.....31
-// Only for debug
+// Only used for debug
 void printf_bsdr(uint32_t a, uint32_t b){
 	int a_bin[32], b_bin[32];
 	for (int i=32; i>0; i--) {
@@ -109,7 +109,6 @@ void printf_bsdr(uint32_t a, uint32_t b){
 				printf("%d ", -i);
 			}
 		}
-
 	}
 	printf("\n");
 }
@@ -123,10 +122,10 @@ uint32_t frandom() {
   return seed32_1;
 }
 
-/*Returns the b-th bit of a 
-	For example if a = 0x4000001 
-		bit(a, 1) returns 1
- 		bit(a,31) returns 1			*/
+//Returns the b-th bit of a 
+//	For example if a = 0x4000001 
+//		bit(a, 1) returns 1
+//		bit(a,31) returns 1			
 uint32_t bit(uint32_t a, uint32_t b) {
     if ((b==0) || (b > 32)) 
       return 0;
@@ -134,7 +133,7 @@ uint32_t bit(uint32_t a, uint32_t b) {
       return (a & mask_bit[b]) >> (b-1);
 }
 
-//Default init vectors
+//Default init hash values
 uint32_t IV1=0x67452301; 
 uint32_t IV2=0xefcdab89;
 uint32_t IV3=0x98badcfe; 
@@ -146,7 +145,7 @@ int block(void){
 	uint32_t Q[65], Q1[61], m[16], m1[16], QM0, QM1, QM2, QM3;
 
 
-	//Initialization vectors
+	//Initialization 
   	QM3 = IV1;  QM0 = IV2;
   	QM1 = IV3;  QM2 = IV4;
 
@@ -156,14 +155,37 @@ int block(void){
 	// 8 = 1000  9 = 1001  A = 1010  B = 1011
 	// C = 1100  D = 1101  E = 1110  F = 1111
 
-  	uint64_t i = 0;
+  	uint64_t i = 1;
 	while(1){
 
-		if(i%10000000 == 0){
-			printf("%ld iterations\n", i);
+		if(i%100000000 == 0){
+			printf("%ld iterations\n\n", i);
 		}
 		i = i + 1;
 
+
+
+
+		//  Q[i] is contructed as shown in the following example:
+		//  	
+		// 	Conditions:
+		//				. ---> no condition on Q[i]
+		//				0 ---> Q[i] must be 0
+		//				1 ---> Q[i] must be 1
+		//				^ ---> Q[i] must be equal to Q[i-1]
+		//
+		//	If we have bitcondition 0000 .... 0000 0000 1111 1111 1111 ^^^^
+		// 
+		//  	1. First Q[i] is generated at random
+		//		2. Set to 0 all bits of Q[i] with bitcondition different than .
+		//			In the example Q[i] = Q[i] & 0x0f000000              ----> 0000 .... 0000 0000 0000 0000 0000 0000
+		//		3. Add the 1's
+		//			In the example Q[i] = Q[i] | 0x0000fff0              ----> 0000 .... 0000 0000 1111 1111 1111 0000
+		//		4. Add the required bits of Q[i-1]
+		// 			In the example Q[i] = Q[i] | ( Q[i-1] & 0x0000000f)  ----> 0000 .... 0000 0000 1111 1111 1111 ^^^^
+		//		
+		//
+		// Q1[i] is constructed satisfying 	∆Q[6] = Q1[i] - Q[i]
 		
 		// Q[1]  = .... .... .... .... .... .... .... .... 
 	    Q [1]  = frandom();
@@ -278,22 +300,22 @@ int block(void){
 	    m1[15] = RR(Q1[16] - Q1[15], 22) - F(Q1[15], Q1[14], Q1[13]) - Q1[12] - 0x49b40821; 
 
 
-	    if( (m1[4] - m[4]) != 0x80000000)
+	    if( (m1[ 4] - m[ 4]) != 0x80000000)
 	    	continue;
 	    
-	    if( (m1[5] - m[5]) != 0x00000000)
+	    if( (m1[ 5] - m[ 5]) != 0x00000000)
 	    	continue;
 
-	    if( (m1[6] - m[6]) != 0x00000000)
+	    if( (m1[ 6] - m[ 6]) != 0x00000000)
 	    	continue;
 	    
-	    if( (m1[7] - m[7]) != 0x00000000)
+	    if( (m1[ 7] - m[ 7]) != 0x00000000)
 	    	continue;
 
-	    if( (m1[8] - m[8]) != 0x00000000)
+	    if( (m1[ 8] - m[ 8]) != 0x00000000)
 	    	continue;
 	    
-	    if( (m1[9] - m[9]) != 0x00000000)
+	    if( (m1[ 9] - m[ 9]) != 0x00000000)
 	    	continue;
 
 	    if( (m1[10] - m[10]) != 0x00000000)
@@ -314,28 +336,32 @@ int block(void){
 	    if( (m1[15] - m[15]) != 0x00000000)
 	    	continue;
 	    
-	    /*
-	    uint32_t temp;
-	    for( int k = 3; k<9 ; k++){
-	    	temp = F(Q1[k], Q1[k-1], Q1[k-2]) - F(Q[k], Q[k-1], Q[k-2]);
-	    	printf("%2.2d %08x\n", k, temp);
-	    }
 
-	    */
+
+	    // For each Q[i]:
+	    // 		the first  'if' checks the bitconditions
+	    //		the second 'if' checks the differential path
 
 
 	    // Q[17] = 0... .... .... ..0. ^... .... .... ^... 
 	    Q [17] = GG(Q [13], Q [16], Q [15], Q [14], m [ 1],  5, 0xf61e2562);
 	    Q1[17] = GG(Q1[13], Q1[16], Q1[15], Q1[14], m1[ 1],  5, 0xf61e2562);
+
 	    if ( bit(Q[17],32) || bit(Q[17],18) || bit(Q[17],16) != bit(Q[16],16) || bit(Q[17],4) != bit(Q[16],4) )
 	    	continue;
-	    
+
+	    if ( (Q[17] ^ Q1[17]) != 0x80000000 ) 
+	    	continue;
 
 
 		// Q[18] = 0.^. .... .... ..1. .... .... .... ....
 	    Q [18] = GG(Q [14], Q [17], Q [16], Q [15], m [ 6],  9, 0xc040b340);
 	    Q1[18] = GG(Q1[14], Q1[17], Q1[16], Q1[15], m1[ 6],  9, 0xc040b340);
+
 	    if ( bit(Q[18],32) || bit(Q[18],30) != bit(Q[17],30) || !bit(Q[18],18) )
+	    	continue;
+
+	    if ( (Q[18] ^ Q1[18]) != 0x80000000 ) 
 	    	continue;
 	    
 
@@ -343,54 +369,162 @@ int block(void){
 	    // Q[19] = 0... .... .... ..0. .... .... .... ....
 	    Q [19] = GG(Q [15], Q [18], Q [17], Q [16], m [11], 14, 0x265e5a51);
 	    Q1[19] = GG(Q1[15], Q1[18], Q1[17], Q1[16], m1[11], 14, 0x265e5a51);
+	    
 	    if ( bit(Q[19],32) || bit(Q[19],18) )
+	    	continue;
+
+	    if ( (Q[19] ^ Q1[19]) != 0x80020000 ) 
 	    	continue;
 	    
 
 	    // Q[20] = 0... .... .... .... .... .... .... ....
 	    Q [20] = GG(Q [16], Q [19], Q [18], Q [17], m [ 0], 20, 0xe9b6c7aa);
 	    Q1[20] = GG(Q1[16], Q1[19], Q1[18], Q1[17], m1[ 0], 20, 0xe9b6c7aa); 
+
 	    if ( bit(Q[20],32) )
+	    	continue;
+
+	    if ( (Q[20] ^ Q1[20]) != 0x80000000 ) 
 	    	continue;
 
 	    // Q[21] = 0... .... .... ..^. .... .... .... ....
 	    Q [21] = GG(Q [17], Q [20], Q [19], Q [18], m [ 5],  5, 0xd62f105d);
-	    Q1[21] = GG(Q1[17], Q1[20], Q1[19], Q1[18], m1[ 5],  5, 0xd62f105d);  
+	    Q1[21] = GG(Q1[17], Q1[20], Q1[19], Q1[18], m1[ 5],  5, 0xd62f105d);
+
 	    if ( bit(Q[21],32) || bit(Q[21],18) != bit(Q[20],18) )
+	    	continue;
+
+	    if ( (Q[21] ^ Q1[21]) != 0x80000000 ) 
 	    	continue;
 
 	    // Q[22] = 0... .... .... .... .... .... .... ....
 	    Q [22] = GG(Q [18], Q [21], Q [20], Q [19], m [10],  9, 0x2441453);
-	    Q1[22] = GG(Q1[18], Q1[21], Q1[20], Q1[19], m1[10],  9, 0x2441453);  
+	    Q1[22] = GG(Q1[18], Q1[21], Q1[20], Q1[19], m1[10],  9, 0x2441453); 
+
 	    if ( bit(Q[22],32) )
+	    	continue;
+
+	    if ( (Q[22] ^ Q1[22]) != 0x80000000 ) 
 	    	continue;
 
 	    // Q[23] = 0... .... .... .... .... .... .... ....
 	    Q [23] = GG(Q [19], Q [22], Q [21], Q [20], m [15], 14, 0xd8a1e681);
-	    Q1[23] = GG(Q1[19], Q1[22], Q1[21], Q1[20], m1[15], 14, 0xd8a1e681); 
+	    Q1[23] = GG(Q1[19], Q1[22], Q1[21], Q1[20], m1[15], 14, 0xd8a1e681);
+
 	    if ( bit(Q[23],32) )
+	    	continue;
+
+	    if ( (Q[23] ^ Q1[23]) != 0x00000000 ) 
 	    	continue;
 
 	    // Q[24] = 0... .... .... .... .... .... .... ....
 	    Q [24] = GG(Q [20], Q [23], Q [22], Q [21], m [ 4], 20, 0xe7d3fbc8);
 	    Q1[24] = GG(Q1[20], Q1[23], Q1[22], Q1[21], m1[ 4], 20, 0xe7d3fbc8); 
+	    
 	    if ( !bit(Q[24],32) )
 	    	continue;
 
-	    // No conditions for Q[25]...Q[47]
+	    if ( (Q[24] ^ Q1[24]) != 0x00000000 ) 
+	    	continue;
+
+	    // No bitconditions for Q[25]...Q[45]
+
+	    Q [25] = GG(Q [21], Q [24], Q [23], Q [22], m [ 9],  5, 0x21e1cde6);
+	    Q1[25] = GG(Q1[21], Q1[24], Q1[23], Q1[22], m1[ 9],  5, 0x21e1cde6);
+
+	    if ( (Q[25] ^ Q1[25]) != 0x00000000 ) 
+	    	continue;
+
+	    Q [26] = GG(Q [22], Q [25], Q [24], Q [23], m [14],  9, 0xc33707d6);
+	    Q1[26] = GG(Q1[22], Q1[25], Q1[24], Q1[23], m1[14],  9, 0xc33707d6);
+
+	    Q [27] = GG(Q [23], Q [26], Q [25], Q [24], m [ 3], 14, 0xf4d50d87);
+	    Q1[27] = GG(Q1[23], Q1[26], Q1[25], Q1[24], m1[ 3], 14, 0xf4d50d87);
+
+	    Q [28] = GG(Q [24], Q [27], Q [26], Q [25], m [ 8], 20, 0x455a14ed);
+	    Q1[28] = GG(Q1[24], Q1[27], Q1[26], Q1[25], m1[ 8], 20, 0x455a14ed);
+
+	    Q [29] = GG(Q [25], Q [28], Q [27], Q [26], m [13],  5, 0xa9e3e905);
+	    Q1[29] = GG(Q1[25], Q1[28], Q1[27], Q1[26], m1[13],  5, 0xa9e3e905);
+
+	    Q [30] = GG(Q [26], Q [29], Q [28], Q [27], m [ 2],  9, 0xfcefa3f8);
+	    Q1[30] = GG(Q1[26], Q1[29], Q1[28], Q1[27], m1[ 2],  9, 0xfcefa3f8);
+
+	    Q [31] = GG(Q [27], Q [30], Q [29], Q [28], m [ 7], 14, 0x676f02d9);
+	    Q1[31] = GG(Q1[27], Q1[30], Q1[29], Q1[28], m1[ 7], 14, 0x676f02d9);
+
+	    Q [32] = GG(Q [28], Q [31], Q [30], Q [29], m [12], 20, 0x8d2a4c8a);
+	    Q1[32] = GG(Q1[28], Q1[31], Q1[30], Q1[29], m1[12], 20, 0x8d2a4c8a);
+
+
+	    Q [33] = HH(Q [29], Q [32], Q [31], Q [30], m [ 5],  4, 0xfffa3942);
+	    Q1[33] = HH(Q1[29], Q1[32], Q1[31], Q1[30], m1[ 5],  4, 0xfffa3942);
+
+	    Q [34] = HH(Q [30], Q [33], Q [32], Q [31], m [ 8], 11, 0x8771f681);
+	    Q1[34] = HH(Q1[30], Q1[33], Q1[32], Q1[31], m1[ 8], 11, 0x8771f681);
+
+	    Q [35] = HH(Q [31], Q [34], Q [33], Q [32], m [11], 16, 0x6d9d6122);
+	    Q1[35] = HH(Q1[31], Q1[34], Q1[33], Q1[32], m1[11], 16, 0x6d9d6122);
+
+	    Q [36] = HH(Q [32], Q [35], Q [34], Q [33], m [14], 23, 0xfde5380c);
+	    Q1[36] = HH(Q1[32], Q1[35], Q1[34], Q1[33], m1[14], 23, 0xfde5380c);
+
+	    Q [37] = HH(Q [33], Q [36], Q [35], Q [34], m [ 1],  4, 0xa4beea44);
+	    Q1[37] = HH(Q1[33], Q1[36], Q1[35], Q1[34], m1[ 1],  4, 0xa4beea44);
+
+	    Q [38] = HH(Q [34], Q [37], Q [36], Q [35], m [ 4], 11, 0x4bdecfa9);
+	    Q1[38] = HH(Q1[34], Q1[37], Q1[36], Q1[35], m1[ 4], 11, 0x4bdecfa9);
+
+	    Q [39] = HH(Q [35], Q [38], Q [37], Q [36], m [ 7], 16, 0xf6bb4b60);
+	    Q1[39] = HH(Q1[35], Q1[38], Q1[37], Q1[36], m1[ 7], 16, 0xf6bb4b60);
+
+	    Q [40] = HH(Q [36], Q [39], Q [38], Q [37], m [10], 23, 0xbebfbc70);
+	    Q1[40] = HH(Q1[36], Q1[39], Q1[38], Q1[37], m1[10], 23, 0xbebfbc70);
+
+	    Q [41] = HH(Q [37], Q [40], Q [39], Q [38], m [13],  4, 0x289b7ec6);
+	    Q1[41] = HH(Q1[37], Q1[40], Q1[39], Q1[38], m1[13],  4, 0x289b7ec6);
+
+	    Q [42] = HH(Q [38], Q [41], Q [40], Q [39], m [ 0], 11, 0xeaa127fa);
+	    Q1[42] = HH(Q1[38], Q1[41], Q1[40], Q1[39], m1[ 0], 11, 0xeaa127fa);
+
+	    Q [43] = HH(Q [39], Q [42], Q [41], Q [40], m [ 3], 16, 0xd4ef3085);
+	    Q1[43] = HH(Q1[39], Q1[42], Q1[41], Q1[40], m1[ 3], 16, 0xd4ef3085);
+
+	    Q [44] = HH(Q [40], Q [43], Q [42], Q [41], m [ 6], 23, 0x4881d05);
+	    Q1[44] = HH(Q1[40], Q1[43], Q1[42], Q1[41], m1[ 6], 23, 0x4881d05);
+
+	    Q [45] = HH(Q [41], Q [44], Q [43], Q [42], m [ 9],  4, 0xd9d4d039);
+	    Q1[45] = HH(Q1[41], Q1[44], Q1[43], Q1[42], m1[ 9],  4, 0xd9d4d039);
+
+	    Q [46] = HH(Q [42], Q [45], Q [44], Q [43], m [12], 11, 0xe6db99e5);
+	    Q1[46] = HH(Q1[42], Q1[45], Q1[44], Q1[43], m1[12], 11, 0xe6db99e5);
+
+	    Q [47] = HH(Q [43], Q [46], Q [45], Q [44], m [15], 16, 0x1fa27cf8);
+	    Q1[47] = HH(Q1[43], Q1[46], Q1[45], Q1[44], m1[15], 16, 0x1fa27cf8);
+
+	    Q [48] = HH(Q [44], Q [47], Q [46], Q [45], m [ 2], 23, 0xc4ac5665);
+	    Q1[48] = HH(Q1[44], Q1[47], Q1[46], Q1[45], m1[ 2], 23, 0xc4ac5665);
+
+
+
+
+
+	    
 
 	    if(DEBUG){
+	    	printf("Printing ∆Q[i] to check if it follows the differential path\n");
 	    	printf("PRINTING BSDR: ∆Q[i]: \n");
-	    	for(int i = 1; i < 25; i++){
+	    	for(int i = 1; i < 48; i++){
 	    		printf("%2.2d  ",i);
 	    		printf_bsdr(Q1[i],Q[i]);
 	    	}
 	    	printf("\n");
 	    }
 
+	    /*
 	    if(DEBUG){
 	    	printf("PRINTING Q[i], Q1[i]:\n");
-	    	for(int i = 1; i < 25; i++){
+	    	for(int i = 1; i < 48; i++){
 	    	printf("%2.2d  ",i);
 	    	print_bin(Q[i]);
 	    	printf("%2.2d  ",i);
@@ -398,9 +532,11 @@ int block(void){
 	    	printf("\n");
 	    	}
 		}
+		*/
 
 	    printf("Found it in %ld iterations\n", i);
 	    printf("Found it in 2^%2.2lf iterations\n", log(i)/log(2));
+	    printf("%lf", log(10));
 	    return 0;
 
 	}
@@ -411,7 +547,7 @@ int main (void){
 	clock_t t;
     t = clock();
 	
-	// Initialicing seed for random number generator
+	// Initializing seed for random number generator
 	srand ( time(NULL) );
 	seed32_1 = rand();
 	seed32_2 = rand() % 162287;
