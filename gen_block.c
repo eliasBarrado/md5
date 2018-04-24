@@ -15,6 +15,8 @@
 #define H(x, y, z) ((x) ^ (y) ^ (z))
 #define I(x, y, z) ((y) ^ ((x) | (~z)))
 
+#define DEBUG 1
+
 uint32_t FF(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint32_t s, uint32_t ac){
  	a = F(b,c,d) + a + x + ac;
  	a = RL(a,s);
@@ -127,10 +129,7 @@ int block(void){
 		// Q[1]  = .... .... .... .... .... .... .... .... 
 	    Q [1]  = frandom();
 	    Q1[1]  = Q[1];
-	    
-	    printf("%08x\n",Q[1]);
-	    print_bin(Q[1]);
-	    return 0;
+	    	    
 	    /*
 	    if(i%1000000 == 0){
 			printf("%ld\n", i);
@@ -254,7 +253,15 @@ int block(void){
 	    m1[14] = RR(Q1[15] - Q1[14], 17) - F(Q1[14], Q1[13], Q1[12]) - Q1[11] - 0xa679438e;
 	    m1[15] = RR(Q1[16] - Q1[15], 22) - F(Q1[15], Q1[14], Q1[13]) - Q1[12] - 0x49b40821; 
 
-	    
+	    if(DEBUG){
+	    	for(int i = 1; i < 16; i++){
+	    	print_bin(Q[i]);
+	    	print_bin(Q1[i]);
+	    	printf("\n");
+	    	}
+		}
+
+		return 0;
 
 	    if( (m[4] - m1[4]) != 0x80000000)
 	    	continue;
