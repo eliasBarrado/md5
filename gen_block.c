@@ -51,6 +51,31 @@ const uint32_t mask_bit[33] = { 0x0,
                                 0x01000000,0x02000000,0x04000000,0x08000000,0x10000000,0x20000000,0x40000000,0x80000000 };
 
 
+void print_bin(uint32_t hex){
+	int bin[32];
+	for (int i=32; i>0; i--) {
+
+		if ( (hex & mask_bit[i]) == mask_bit[i] ) {
+			bin[i-1] = 1;
+
+		} else {
+			bin[i-1] = 0;
+		}
+	}
+	int k =0;
+	for (int i=32; i>0; i--) {
+		printf("%d", bin[i-1]);
+		k++;
+		if(k%4 == 0 && k!=0){
+			printf(" ");
+		}
+		
+
+	}
+	printf("\n");
+}
+
+
 //uint32_t X;
 uint32_t seed32_1, seed32_2; 
 uint32_t frandom() {
@@ -103,6 +128,9 @@ int block(void){
 	    Q [1]  = frandom();
 	    Q1[1]  = Q[1];
 	    
+	    printf("%08x\n",Q[1]);
+	    print_bin(Q[1]);
+	    return 0;
 	    /*
 	    if(i%1000000 == 0){
 			printf("%ld\n", i);
@@ -244,9 +272,9 @@ int block(void){
 	    	continue;
 	    
 	    if( (m[9] - m1[9]) != 0x00000000)
-	    	printf("%08x\n"  ,m[9] - m1[9]);
+	    	printf("%08x\n"  , ~(m[9] - m1[9]));
 	    	printf("%ld\n",i);
-	    	return 0;
+	    	//return 0;
 	    	continue;
 	    /*
 	    if( (m[10] ^ m1[10]) != 0x00000000)
@@ -258,7 +286,7 @@ int block(void){
 
 	    uint32_t temp;
 	    for( int k = 3; k<9 ; k++){
-	    	temp = F(Q[k], Q[k-1], Q[k-2]) ^ F(Q1[k], Q1[k-1], Q1[k-2]);
+	    	temp = F(Q1[k], Q1[k-1], Q1[k-2]) - F(Q[k], Q[k-1], Q[k-2]);
 	    	printf("%2.2d %08x\n", k, temp);
 	    }
 
