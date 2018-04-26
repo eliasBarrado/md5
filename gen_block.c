@@ -126,11 +126,9 @@ uint32_t frandom() {
 //Returns the b-th bit of a 
 //	For example if a = 0x4000001 
 //		bit(a, 1) returns 1
-//		bit(a,31) returns 1			
+//		bit(a,31) returns 1
+//Provide a valid b ==> 0 < b < 33			
 uint32_t bit(uint32_t a, uint32_t b) {
-    if ((b==0) || (b > 32)) 
-      return 0;
-    else
       return (a & mask_bit[b]) >> (b-1);
 }
 
@@ -157,12 +155,13 @@ int block(void){
 	// C = 1100  D = 1101  E = 1110  F = 1111
 
   	uint64_t i = 1;
+  	uint64_t j = 1;
 	while(1){
 
 		if(i%100000000 == 0){
 			printf("%ld iterations\n\n", i);
 		}
-		i = i + 1;
+		i++;
 
 
 
@@ -337,7 +336,7 @@ int block(void){
 	    if( (m1[15] - m[15]) != 0x00000000)
 	    	continue;
 
-
+	    j++;
 	    // For each Q[i]:
 	    // 		the first  'if' checks the bitconditions
 	    //		the second 'if' checks the differential path
@@ -586,6 +585,7 @@ int block(void){
 		Q1[50] = II(Q1[46], Q1[49], Q1[48], Q1[47], m1[ 7], 10, 0x432aff97);
 
 		printf("Round 50\n");
+		printf("%lf\n", (double)(j)/i*100 );
 
 		if ( bit(Q[50],32) != (!bit(Q[48],32)) )
 			continue;
@@ -596,6 +596,8 @@ int block(void){
 		Q [51] = II(Q [47], Q [50], Q [49], Q [48], m [14], 15, 0xab9423a7);
 		Q1[51] = II(Q1[47], Q1[50], Q1[49], Q1[48], m1[14], 15, 0xab9423a7);
 
+		printf("Round 51\n");
+
 		if ( bit(Q[51],32) != bit(Q[49],32) ) 
 	    	continue;
 
@@ -604,6 +606,8 @@ int block(void){
 	    
 		Q [52] = II(Q [48], Q [51], Q [50], Q [49], m [ 5], 21, 0xfc93a039);
 		Q1[52] = II(Q1[48], Q1[51], Q1[50], Q1[49], m1[ 5], 21, 0xfc93a039);
+
+		printf("Round 52\n");
 
 		if ( bit(Q[52],32) != bit(Q[50],32) ) 
 	    	continue;
@@ -614,6 +618,8 @@ int block(void){
 		Q [53] = II(Q [49], Q [52], Q [51], Q [50], m [12],  6, 0x655b59c3);
 		Q1[53] = II(Q1[49], Q1[52], Q1[51], Q1[50], m1[12],  6, 0x655b59c3);
 
+		printf("Round 53\n");
+
 		if ( bit(Q[53],32) != bit(Q[51],32) ) 
 	    	continue;
 
@@ -623,53 +629,55 @@ int block(void){
 		Q [54] = II(Q [50], Q [53], Q [52], Q [51], m [ 3], 10, 0x8f0ccc92);
 		Q1[54] = II(Q1[50], Q1[53], Q1[52], Q1[51], m1[ 3], 10, 0x8f0ccc92);
 
+		printf("Round 54\n");
+
 		if ( bit(Q[54],32) != bit(Q[52],32) ) 
 	    	continue;
 
 		if ( (Q1[54] - Q[54]) != 0x80000000 ) 
 	    	continue;
-	    /*
+	    
 		Q [55] = II(Q [51], Q [54], Q [53], Q [52], m [10], 15, 0xffeff47d);
 		Q1[55] = II(Q1[51], Q1[54], Q1[53], Q1[52], m1[10], 15, 0xffeff47d);
 
-		if ( (Q1[55] - Q[55]) != 0x80000000 ) 
-	    	continue;
+//		if ( (Q1[55] - Q[55]) != 0x80000000 ) 
+//	    	continue;
 
 		Q [56] = II(Q [52], Q [55], Q [54], Q [53], m [ 1], 21, 0x85845dd1);
 		Q1[56] = II(Q1[52], Q1[55], Q1[54], Q1[53], m1[ 1], 21, 0x85845dd1);
 
-		if ( (Q1[56] - Q[56]) != 0x80000000 ) 
-	    	continue;
+//		if ( (Q1[56] - Q[56]) != 0x80000000 ) 
+//	    	continue;
 
 		Q [57] = II(Q [53], Q [56], Q [55], Q [54], m [ 8],  6, 0x6fa87e4f);
 		Q1[57] = II(Q1[53], Q1[56], Q1[55], Q1[54], m1[ 8],  6, 0x6fa87e4f);
 
-		if ( (Q1[57] - Q[57]) != 0x80000000 ) 
-	    	continue;
+//		if ( (Q1[57] - Q[57]) != 0x80000000 ) 
+//	    	continue;
 
 		Q [58] = II(Q [54], Q [57], Q [56], Q [55], m [15], 10, 0xfe2ce6e0);
 		Q1[58] = II(Q1[54], Q1[57], Q1[56], Q1[55], m1[15], 10, 0xfe2ce6e0);
 
-		if ( (Q1[58] - Q[58]) != 0x80000000 ) 
-	    	continue;
+//		if ( (Q1[58] - Q[58]) != 0x80000000 ) 
+//	    	continue;
 
 		Q [59] = II(Q [55], Q [58], Q [57], Q [56], m [ 6], 15, 0xa3014314);
 		Q1[59] = II(Q1[55], Q1[58], Q1[57], Q1[56], m1[ 6], 15, 0xa3014314);
 
-		if ( (Q1[59] - Q[59]) != 0x80000000 ) 
-	    	continue;
+//		if ( (Q1[59] - Q[59]) != 0x80000000 ) 
+//	    	continue;
 
 		Q [60] = II(Q [56], Q [59], Q [58], Q [57], m [13],  21, 0x4e0811a1);
 		Q1[60] = II(Q1[56], Q1[59], Q1[58], Q1[57], m1[13],  21, 0x4e0811a1);
 
-		if ( (Q1[60] - Q[60]) != 0x80000000 ) 
-	    	continue;
+//		if ( (Q1[60] - Q[60]) != 0x80000000 ) 
+//	    	continue;
 
 		Q [61] = II(Q [57], Q [60], Q [59], Q [58], m [ 4],  6, 0xf7537e82);
 		Q1[61] = II(Q1[57], Q1[60], Q1[59], Q1[58], m1[ 4],  6, 0xf7537e82);
 
-		if ( (Q1[61] - Q[61]) != 0x80000000 ) 
-	    	continue;
+//		if ( (Q1[61] - Q[61]) != 0x80000000 ) 
+//	    	continue;
 
 		Q [62] = II(Q [58], Q [61], Q [60], Q [59], m [11], 10, 0xbd3af235);
 		Q1[62] = II(Q1[58], Q1[61], Q1[60], Q1[59], m1[11], 10, 0xbd3af235);
@@ -680,7 +688,7 @@ int block(void){
 		Q [64] = II(Q [60], Q [63], Q [62], Q [61], m [ 9], 21, 0xeb86d391);
 		Q1[64] = II(Q1[60], Q1[63], Q1[62], Q1[61], m1[ 9], 21, 0xeb86d391);
 
-		*/
+		
 
 
 	    
