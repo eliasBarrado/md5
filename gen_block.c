@@ -3,6 +3,7 @@
 #include <time.h>
 #include <math.h>
 #include <stdint.h>
+#include <unistd.h>
 
 
 #define RR(x, n) (((x) >> (n)) | ((x) << (32-(n))))
@@ -65,7 +66,7 @@ void print_bin(uint32_t hex){
 			bin[i-1] = 0;
 		}
 	}
-	int k =0;
+	int k = 0;
 	for (int i=32; i>0; i--) {
 		printf("%d", bin[i-1]);
 		k++;
@@ -185,7 +186,7 @@ int block(void){
 		// 			In the example Q[i] = Q[i] | ( Q[i-1] & 0x0000000f)  ----> 0000 .... 0000 0000 1111 1111 1111 ^^^^
 		//		
 		//
-		// Q1[i] is constructed satisfying 	∆Q[6] = Q1[i] - Q[i]
+		// Q1[i] is constructed satisfying 	∆Q[i] = Q1[i] - Q[i]
 		
 		// Q[1]  = .... .... .... .... .... .... .... .... 
 	    Q [1]  = frandom();
@@ -263,7 +264,7 @@ int block(void){
 	    Q [16] = (frandom() & 0x5fffffff) | 0x20000000;
 	    Q1[16] = Q[16] ^ 0xa0000000;
 
-		//Compute first block 
+		//Compute first block of first message
 	    m[ 0] = RR(Q[ 1] - QM0  ,  7) - F(QM0  , QM1  , QM2  ) - QM3   - 0xd76aa478;  
 	    m[ 1] = RR(Q[ 2] - Q[ 1], 12) - F(Q[ 1], QM0  , QM1  ) - QM2   - 0xe8c7b756;
 	    m[ 2] = RR(Q[ 3] - Q[ 2], 17) - F(Q[ 2], Q[ 1], QM0  ) - QM1   - 0x242070db;
@@ -281,10 +282,10 @@ int block(void){
 	    m[14] = RR(Q[15] - Q[14], 17) - F(Q[14], Q[13], Q[12]) - Q[11] - 0xa679438e;
 	    m[15] = RR(Q[16] - Q[15], 22) - F(Q[15], Q[14], Q[13]) - Q[12] - 0x49b40821; 
 
-	    //Compute second block 
-	    m1[ 0] = RR(Q1[ 1] - QM0   ,  7) - F(QM0   , QM1   , QM2  )  - QM3    - 0xd76aa478;  
-	    m1[ 1] = RR(Q1[ 2] - Q1[ 1], 12) - F(Q1[ 1], QM0   , QM1  )  - QM2    - 0xe8c7b756;
-	    m1[ 2] = RR(Q1[ 3] - Q1[ 2], 17) - F(Q1[ 2], Q1[ 1], QM0  )  - QM1    - 0x242070db;
+	    //Compute first block of second message
+	    m1[ 0] = RR(Q1[ 1] - QM0   ,  7) - F(QM0   , QM1   , QM2   ) - QM3    - 0xd76aa478;  
+	    m1[ 1] = RR(Q1[ 2] - Q1[ 1], 12) - F(Q1[ 1], QM0   , QM1   ) - QM2    - 0xe8c7b756;
+	    m1[ 2] = RR(Q1[ 3] - Q1[ 2], 17) - F(Q1[ 2], Q1[ 1], QM0   ) - QM1    - 0x242070db;
 	    m1[ 3] = RR(Q1[ 4] - Q1[ 3], 22) - F(Q1[ 3], Q1[ 2], Q1[ 1]) - QM0    - 0xc1bdceee;
 	    m1[ 4] = RR(Q1[ 5] - Q1[ 4],  7) - F(Q1[ 4], Q1[ 3], Q1[ 2]) - Q1[ 1] - 0xf57c0faf;
 	    m1[ 5] = RR(Q1[ 6] - Q1[ 5], 12) - F(Q1[ 5], Q1[ 4], Q1[ 3]) - Q1[ 2] - 0x4787c62a;
@@ -352,13 +353,6 @@ int block(void){
 	    if ( (Q[17] ^ Q1[17]) != 0x80000000 ) 
 	    	continue;
 
-
-	    print_bin(G(Q1[16], Q1[15], Q1[14]) - G(Q[16], Q[15], Q[14]));
-	    if( (G(Q1[16], Q1[15], Q1[14]) - G(Q[16], Q[15], Q[14])) != 0x80000000 )
-	    	continue;
-
-	    return 0;
-
 		// Q[18] = 0.^. .... .... ..1. .... .... .... ....
 	    Q [18] = GG(Q [14], Q [17], Q [16], Q [15], m [ 6],  9, 0xc040b340);
 	    Q1[18] = GG(Q1[14], Q1[17], Q1[16], Q1[15], m1[ 6],  9, 0xc040b340);
@@ -368,8 +362,6 @@ int block(void){
 
 	    if ( (Q[18] ^ Q1[18]) != 0x80000000 ) 
 	    	continue;
-	    
-
 	    
 	    // Q[19] = 0... .... .... ..0. .... .... .... ....
 	    Q [19] = GG(Q [15], Q [18], Q [17], Q [16], m [11], 14, 0x265e5a51);
@@ -381,7 +373,6 @@ int block(void){
 	    if ( (Q[19] ^ Q1[19]) != 0x80020000 ) 
 	    	continue;
 	    
-
 	    // Q[20] = 0... .... .... .... .... .... .... ....
 	    Q [20] = GG(Q [16], Q [19], Q [18], Q [17], m [ 0], 20, 0xe9b6c7aa);
 	    Q1[20] = GG(Q1[16], Q1[19], Q1[18], Q1[17], m1[ 0], 20, 0xe9b6c7aa); 
@@ -439,7 +430,7 @@ int block(void){
 
 	    if ( (Q[25] ^ Q1[25]) != 0x00000000 ) 
 	    	continue;
-
+	    
 	    Q [26] = GG(Q [22], Q [25], Q [24], Q [23], m [14],  9, 0xc33707d6);
 	    Q1[26] = GG(Q1[22], Q1[25], Q1[24], Q1[23], m1[14],  9, 0xc33707d6);
 
@@ -576,48 +567,37 @@ int block(void){
 	    Q [48] = HH(Q [44], Q [47], Q [46], Q [45], m [ 2], 23, 0xc4ac5665);
 	    Q1[48] = HH(Q1[44], Q1[47], Q1[46], Q1[45], m1[ 2], 23, 0xc4ac5665);
 
-	    if ( bit(Q1[48],32) != bit(Q[46],32) ){ 
-	    	printf("a\n");
-	    	continue;}
-
-
-	    if ( (Q1[48] - Q[48]) != 0x80000000 ){
-	    printf("b\n"); 
+	    if ( bit(Q[48],32) != bit(Q[46],32) )
 	    	continue;
-	    }
+
+	    if ( (Q1[48] - Q[48]) != 0x80000000 )
+	    	continue;
 
 	    Q [49] = II(Q [45], Q [48], Q [47], Q [46], m [ 0],  6, 0xf4292244);
 		Q1[49] = II(Q1[45], Q1[48], Q1[47], Q1[46], m1[ 0],  6, 0xf4292244);
 
-		if ( bit(Q1[49],32) != bit(Q[47],32) ){
-		printf("c\n"); 
+		if ( bit(Q[49],32) != bit(Q[47],32) ) 
 	    	continue;
-}
-		if ( (Q1[49] - Q[49]) != 0x80000000 ) {
-			printf("d\n");
-	    	continue;
-		}
 
-	    /*
+		if ( (Q1[49] - Q[49]) != 0x80000000 ) 
+	    	continue;
 
 		Q [50] = II(Q [46], Q [49], Q [48], Q [47], m [ 7], 10, 0x432aff97);
 		Q1[50] = II(Q1[46], Q1[49], Q1[48], Q1[47], m1[ 7], 10, 0x432aff97);
 
-		if ( bit(Q1[50],32) != (!bit(Q[48],32)) ){
-			printf("%08x",bit(Q[48],32));
-			printf("%08x",!bit(Q[48],32));
+		printf("Round 50\n");
 
+		if ( bit(Q[50],32) != (!bit(Q[48],32)) )
 			continue;
-		} 
-	    	
 
 		if ( (Q1[50] - Q[50]) != 0x80000000 ) 
 	    	continue;
 
-	    /*
-
 		Q [51] = II(Q [47], Q [50], Q [49], Q [48], m [14], 15, 0xab9423a7);
 		Q1[51] = II(Q1[47], Q1[50], Q1[49], Q1[48], m1[14], 15, 0xab9423a7);
+
+		if ( bit(Q[51],32) != bit(Q[49],32) ) 
+	    	continue;
 
 		if ( (Q1[51] - Q[51]) != 0x80000000 ) 
 	    	continue;
@@ -625,11 +605,17 @@ int block(void){
 		Q [52] = II(Q [48], Q [51], Q [50], Q [49], m [ 5], 21, 0xfc93a039);
 		Q1[52] = II(Q1[48], Q1[51], Q1[50], Q1[49], m1[ 5], 21, 0xfc93a039);
 
+		if ( bit(Q[52],32) != bit(Q[50],32) ) 
+	    	continue;
+
 		if ( (Q1[52] - Q[52]) != 0x80000000 ) 
 	    	continue;
-	    /*
+	    
 		Q [53] = II(Q [49], Q [52], Q [51], Q [50], m [12],  6, 0x655b59c3);
 		Q1[53] = II(Q1[49], Q1[52], Q1[51], Q1[50], m1[12],  6, 0x655b59c3);
+
+		if ( bit(Q[53],32) != bit(Q[51],32) ) 
+	    	continue;
 
 		if ( (Q1[53] - Q[53]) != 0x80000000 ) 
 	    	continue;
@@ -637,9 +623,12 @@ int block(void){
 		Q [54] = II(Q [50], Q [53], Q [52], Q [51], m [ 3], 10, 0x8f0ccc92);
 		Q1[54] = II(Q1[50], Q1[53], Q1[52], Q1[51], m1[ 3], 10, 0x8f0ccc92);
 
-		if ( (Q1[54] - Q[54]) != 0x80000000 ) 
+		if ( bit(Q[54],32) != bit(Q[52],32) ) 
 	    	continue;
 
+		if ( (Q1[54] - Q[54]) != 0x80000000 ) 
+	    	continue;
+	    /*
 		Q [55] = II(Q [51], Q [54], Q [53], Q [52], m [10], 15, 0xffeff47d);
 		Q1[55] = II(Q1[51], Q1[54], Q1[53], Q1[52], m1[10], 15, 0xffeff47d);
 
@@ -710,9 +699,9 @@ int block(void){
 	    if(DEBUG){
 	    	printf("PRINTING Q[i], Q1[i]:\n");
 	    	for(int i = 1; i < 65; i++){
-	    	printf("%2.2d  ",i);
+	    	printf("Q [%2.2d]  ",i);
 	    	print_bin(Q[i]);
-	    	printf("%2.2d  ",i);
+	    	printf("Q1[%2.2d]  ",i);
 	    	print_bin(Q1[i]);
 	    	printf("\n");
 	    	}
@@ -737,11 +726,10 @@ int main (void){
 	seed32_2 = rand() % 162287;
 
 	block();
-
+	
 	time_t end = time(NULL);
 
-	//double time_taken = ((double)t)/CLOCKS_PER_SEC;
-	printf("%ld seconds to execute \n", end-start);
+	printf("%u seconds to execute \n", (uint32_t)(end-start));
 
 	return 0;
 }
