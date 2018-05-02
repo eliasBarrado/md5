@@ -133,10 +133,10 @@ uint32_t bit(uint32_t a, uint32_t b) {
 }
 
 //Default init hash values
-uint32_t IV1=0x67452301; 
-uint32_t IV2=0xefcdab89;
-uint32_t IV3=0x98badcfe; 
-uint32_t IV4=0x10325476;
+uint32_t IV1=0x67452501; 
+uint32_t IV2=0xefddac89;
+uint32_t IV3=0x98cafcfe; 
+uint32_t IV4=0x10425476;
 
 
 int block(void){
@@ -162,7 +162,6 @@ int block(void){
 			printf("%ld iterations\n\n", i);
 		}
 		i++;
-
 
 
 
@@ -300,6 +299,7 @@ int block(void){
 	    m1[15] = RR(Q1[16] - Q1[15], 22) - F(Q1[15], Q1[14], Q1[13]) - Q1[12] - 0x49b40821; 
 
 
+
 	    if( (m1[ 4] - m[ 4]) != 0x80000000)
 	    	continue;
 	    
@@ -336,7 +336,6 @@ int block(void){
 	    if( (m1[15] - m[15]) != 0x00000000)
 	    	continue;
 
-	    j++;
 	    // For each Q[i]:
 	    // 		the first  'if' checks the bitconditions
 	    //		the second 'if' checks the differential path
@@ -346,11 +345,36 @@ int block(void){
 	    Q [17] = GG(Q [13], Q [16], Q [15], Q [14], m [ 1],  5, 0xf61e2562);
 	    Q1[17] = GG(Q1[13], Q1[16], Q1[15], Q1[14], m1[ 1],  5, 0xf61e2562);
 
+	    // Message modification
+	    if(bit(Q[17],32)){
+	
+	    	m [ 1] = m[1] + 0x04000000;
+	    	m1[ 1] = m[1];
+	    	
+			Q [ 2] = RL(m [1] + F(Q [ 1], QM0  , QM1  ) + QM2 + 0xe8c7b756, 12) + Q [1];
+			Q1[ 2] = RL(m1[1] + F(Q1[ 1], QM0  , QM1  ) + QM2 + 0xe8c7b756, 12) + Q1[1];	    	
+
+	    	m [ 2] = RR(Q [ 3] - Q [ 2], 17) - F(Q [ 2], Q [ 1], QM0   ) - QM1    - 0x242070db;
+	    	m [ 3] = RR(Q [ 4] - Q [ 3], 22) - F(Q [ 3], Q [ 2], Q [ 1]) - QM0    - 0xc1bdceee;
+	    	m [ 4] = RR(Q [ 5] - Q [ 4],  7) - F(Q [ 4], Q [ 3], Q [ 2]) - Q [ 1] - 0xf57c0faf;
+	    	m [ 5] = RR(Q [ 6] - Q [ 5], 12) - F(Q [ 5], Q [ 4], Q [ 3]) - Q [ 2] - 0x4787c62a;
+
+	    	m1[ 2] = RR(Q1[ 3] - Q1[ 2], 17) - F(Q1[ 2], Q1[ 1], QM0  )  - QM1    - 0x242070db;
+	    	m1[ 3] = RR(Q1[ 4] - Q1[ 3], 22) - F(Q1[ 3], Q1[ 2], Q1[ 1]) - QM0    - 0xc1bdceee;
+	    	m1[ 4] = RR(Q1[ 5] - Q1[ 4],  7) - F(Q1[ 4], Q1[ 3], Q1[ 2]) - Q1[ 1] - 0xf57c0faf;
+	    	m1[ 5] = RR(Q1[ 6] - Q1[ 5], 12) - F(Q1[ 5], Q1[ 4], Q1[ 3]) - Q1[ 2] - 0x4787c62a;
+
+	    	Q [17] = GG(Q [13], Q [16], Q [15], Q [14], m [ 1],  5, 0xf61e2562);
+	    	Q1[17] = GG(Q1[13], Q1[16], Q1[15], Q1[14], m1[ 1],  5, 0xf61e2562);
+
+	    }
+
 	    if ( bit(Q[17],32) || bit(Q[17],18) || bit(Q[17],16) != bit(Q[16],16) || bit(Q[17],4) != bit(Q[16],4) )
 	    	continue;
 
 	    if ( (Q[17] ^ Q1[17]) != 0x80000000 ) 
 	    	continue;
+
 
 		// Q[18] = 0.^. .... .... ..1. .... .... .... ....
 	    Q [18] = GG(Q [14], Q [17], Q [16], Q [15], m [ 6],  9, 0xc040b340);
@@ -374,8 +398,8 @@ int block(void){
 	    
 	    // Q[20] = 0... .... .... .... .... .... .... ....
 	    Q [20] = GG(Q [16], Q [19], Q [18], Q [17], m [ 0], 20, 0xe9b6c7aa);
-	    Q1[20] = GG(Q1[16], Q1[19], Q1[18], Q1[17], m1[ 0], 20, 0xe9b6c7aa); 
-
+	    Q1[20] = GG(Q1[16], Q1[19], Q1[18], Q1[17], m1[ 0], 20, 0xe9b6c7aa);
+//	    j++;
 	    if ( bit(Q[20],32) )
 	    	continue;
 
@@ -426,6 +450,9 @@ int block(void){
 
 	    Q [25] = GG(Q [21], Q [24], Q [23], Q [22], m [ 9],  5, 0x21e1cde6);
 	    Q1[25] = GG(Q1[21], Q1[24], Q1[23], Q1[22], m1[ 9],  5, 0x21e1cde6);
+
+	    printf("Round 25\n");
+//	    printf("%lf\n", (double)(j)/i*100 );
 
 	    if ( (Q[25] ^ Q1[25]) != 0x00000000 ) 
 	    	continue;
@@ -518,6 +545,8 @@ int block(void){
 	    Q [40] = HH(Q [36], Q [39], Q [38], Q [37], m [10], 23, 0xbebfbc70);
 	    Q1[40] = HH(Q1[36], Q1[39], Q1[38], Q1[37], m1[10], 23, 0xbebfbc70);
 
+	    printf("Round 40\n");
+	    
 	    if ( (Q1[40] - Q[40]) != 0x80000000 ) 
 	    	continue;
 
@@ -585,7 +614,6 @@ int block(void){
 		Q1[50] = II(Q1[46], Q1[49], Q1[48], Q1[47], m1[ 7], 10, 0x432aff97);
 
 		printf("Round 50\n");
-		printf("%lf\n", (double)(j)/i*100 );
 
 		if ( bit(Q[50],32) != (!bit(Q[48],32)) )
 			continue;
