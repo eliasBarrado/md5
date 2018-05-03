@@ -451,7 +451,6 @@ int block(void){
 	    Q [25] = GG(Q [21], Q [24], Q [23], Q [22], m [ 9],  5, 0x21e1cde6);
 	    Q1[25] = GG(Q1[21], Q1[24], Q1[23], Q1[22], m1[ 9],  5, 0x21e1cde6);
 
-	    printf("Round 25\n");
 //	    printf("%lf\n", (double)(j)/i*100 );
 
 	    if ( (Q[25] ^ Q1[25]) != 0x00000000 ) 
@@ -668,6 +667,8 @@ int block(void){
 		Q [55] = II(Q [51], Q [54], Q [53], Q [52], m [10], 15, 0xffeff47d);
 		Q1[55] = II(Q1[51], Q1[54], Q1[53], Q1[52], m1[10], 15, 0xffeff47d);
 
+		printf("Round 55\n");
+
 		if ( bit(Q[55],32) != bit(Q[53],32) ) 
 	    	continue;
 
@@ -676,6 +677,8 @@ int block(void){
 
 		Q [56] = II(Q [52], Q [55], Q [54], Q [53], m [ 1], 21, 0x85845dd1);
 		Q1[56] = II(Q1[52], Q1[55], Q1[54], Q1[53], m1[ 1], 21, 0x85845dd1);
+
+		printf("Round 56\n");
 
 		if ( bit(Q[56],32) != bit(Q[54],32) ) 
 	    	continue;
