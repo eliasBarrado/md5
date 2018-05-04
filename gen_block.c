@@ -154,13 +154,13 @@ int block(void){
 	// 8 = 1000  9 = 1001  A = 1010  B = 1011
 	// C = 1100  D = 1101  E = 1110  F = 1111
 
-  	uint64_t i = 1;
+  	uint64_t i = 0;
   	uint64_t j = 1;
 	while(1){
 
-		if(i%100000000 == 0){
-			printf("%ld iterations\n\n", i);
-		}
+//		if(i%1000000000 == 0){
+//			printf("%ld iterations\n\n", i);
+//		}
 		i++;
 
 
@@ -617,6 +617,7 @@ int block(void){
 		Q1[50] = II(Q1[46], Q1[49], Q1[48], Q1[47], m1[ 7], 10, 0x432aff97);
 
 		printf("Round 50\n");
+		printf("2^%2.2lf iterations\n", log(i)/log(2));
 
 		if ( bit(Q[50],32) != (!bit(Q[48],32)) )
 			continue;
@@ -715,7 +716,7 @@ int block(void){
 		Q [59] = II(Q [55], Q [58], Q [57], Q [56], m [ 6], 15, 0xa3014314);
 		Q1[59] = II(Q1[55], Q1[58], Q1[57], Q1[56], m1[ 6], 15, 0xa3014314);
 
-		printf("Round 58\n");
+		printf("Round 59\n");
 
 		if ( bit(Q[59],32) != bit(Q[57],32) ) 
 	    	continue;
@@ -774,7 +775,6 @@ int block(void){
 
 	    printf("Found it in %ld iterations\n", i);
 	    printf("Found it in 2^%2.2lf iterations\n", log(i)/log(2));
-	    printf("%lf", log(10));
 	    return 0;
 
 	}
