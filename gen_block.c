@@ -154,13 +154,23 @@ int block(void){
 	// 8 = 1000  9 = 1001  A = 1010  B = 1011
 	// C = 1100  D = 1101  E = 1110  F = 1111
 
-  	uint64_t i = 0;
-  	uint64_t j = 1;
+  	uint64_t i = 1;
+  	uint64_t j = 0;
+  	uint64_t l = 0;
+  	int round21 = 0;
+  	int contneg = 0;
+  	int contpos = 0;
+
 	while(1){
 
-//		if(i%1000000000 == 0){
+		if(i%1000000000 == 0){
+			printf("%d\n", round21);
+			printf("%d\n", contpos);
+			printf("%d\n", contneg);
+			printf("%8.8lf\n", (double)(round21)/i*100);
+			return 0;
 //			printf("%ld iterations\n\n", i);
-//		}
+		}
 		i++;
 
 
@@ -342,6 +352,7 @@ int block(void){
 	    if( (m1[15] - m[15]) != 0x00000000)
 	    	continue;
 
+
 	    // For each Q[i]:
 	    // 		the first  'if' checks the bitconditions
 	    //		the second 'if' checks the differential path
@@ -351,10 +362,49 @@ int block(void){
 	    Q [17] = GG(Q [13], Q [16], Q [15], Q [14], m [ 1],  5, 0xf61e2562);
 	    Q1[17] = GG(Q1[13], Q1[16], Q1[15], Q1[14], m1[ 1],  5, 0xf61e2562);
 
+	    int neg = 0;
+	    int pos = 0;
+
 	    // Message modification
+
+	    if(bit(Q[17],18)){
+			
+			if(bit(Q[2],25)){
+	    		m [ 1] = m[1] - 0x00000800; 
+	    	} else {
+	    		m [ 1] = m[1] + 0x00000800;
+	    	}
+
+	    	m1[ 1] = m[1];
+	    	
+			Q [ 2] = RL(m [1] + F(Q [ 1], QM0  , QM1  ) + QM2 + 0xe8c7b756, 12) + Q [1];
+			Q1[ 2] = RL(m1[1] + F(Q1[ 1], QM0  , QM1  ) + QM2 + 0xe8c7b756, 12) + Q1[1];	    	
+
+	    	m [ 2] = RR(Q [ 3] - Q [ 2], 17) - F(Q [ 2], Q [ 1], QM0   ) - QM1    - 0x242070db;
+	    	m [ 3] = RR(Q [ 4] - Q [ 3], 22) - F(Q [ 3], Q [ 2], Q [ 1]) - QM0    - 0xc1bdceee;
+	    	m [ 4] = RR(Q [ 5] - Q [ 4],  7) - F(Q [ 4], Q [ 3], Q [ 2]) - Q [ 1] - 0xf57c0faf;
+	    	m [ 5] = RR(Q [ 6] - Q [ 5], 12) - F(Q [ 5], Q [ 4], Q [ 3]) - Q [ 2] - 0x4787c62a;
+
+	    	m1[ 2] = RR(Q1[ 3] - Q1[ 2], 17) - F(Q1[ 2], Q1[ 1], QM0  )  - QM1    - 0x242070db;
+	    	m1[ 3] = RR(Q1[ 4] - Q1[ 3], 22) - F(Q1[ 3], Q1[ 2], Q1[ 1]) - QM0    - 0xc1bdceee;
+	    	m1[ 4] = RR(Q1[ 5] - Q1[ 4],  7) - F(Q1[ 4], Q1[ 3], Q1[ 2]) - Q1[ 1] - 0xf57c0faf;
+	    	m1[ 5] = RR(Q1[ 6] - Q1[ 5], 12) - F(Q1[ 5], Q1[ 4], Q1[ 3]) - Q1[ 2] - 0x4787c62a;
+
+	    	Q [17] = GG(Q [13], Q [16], Q [15], Q [14], m [ 1],  5, 0xf61e2562);
+	    	Q1[17] = GG(Q1[13], Q1[16], Q1[15], Q1[14], m1[ 1],  5, 0xf61e2562);
+
+	    }
+
 	    if(bit(Q[17],32)){
-	
-	    	m [ 1] = m[1] + 0x04000000;
+			
+			if(bit(Q[2],7)){
+	    		m [ 1] = m[1] - 0x04000000;
+	    		neg=1; 
+	    	} else {
+	    		m [ 1] = m[1] + 0x04000000;
+	    		pos=1;
+	    	}
+
 	    	m1[ 1] = m[1];
 	    	
 			Q [ 2] = RL(m [1] + F(Q [ 1], QM0  , QM1  ) + QM2 + 0xe8c7b756, 12) + Q [1];
@@ -381,7 +431,6 @@ int block(void){
 	    if ( (Q[17] ^ Q1[17]) != 0x80000000 ) 
 	    	continue;
 
-
 		// Q[18] = 0.^. .... .... ..1. .... .... .... ....
 	    Q [18] = GG(Q [14], Q [17], Q [16], Q [15], m [ 6],  9, 0xc040b340);
 	    Q1[18] = GG(Q1[14], Q1[17], Q1[16], Q1[15], m1[ 6],  9, 0xc040b340);
@@ -405,7 +454,7 @@ int block(void){
 	    // Q[20] = 0... .... .... .... .... .... .... ....
 	    Q [20] = GG(Q [16], Q [19], Q [18], Q [17], m [ 0], 20, 0xe9b6c7aa);
 	    Q1[20] = GG(Q1[16], Q1[19], Q1[18], Q1[17], m1[ 0], 20, 0xe9b6c7aa);
-//	    j++;
+   
 	    if ( bit(Q[20],32) )
 	    	continue;
 
@@ -415,6 +464,13 @@ int block(void){
 	    // Q[21] = 0... .... .... ..^. .... .... .... ....
 	    Q [21] = GG(Q [17], Q [20], Q [19], Q [18], m [ 5],  5, 0xd62f105d);
 	    Q1[21] = GG(Q1[17], Q1[20], Q1[19], Q1[18], m1[ 5],  5, 0xd62f105d);
+
+	    if(pos)
+	    	contpos++;
+	    if(neg)
+	    	contneg++;
+
+	    round21++;
 
 	    if ( bit(Q[21],32) || bit(Q[21],18) != bit(Q[20],18) )
 	    	continue;
@@ -457,7 +513,10 @@ int block(void){
 	    Q [25] = GG(Q [21], Q [24], Q [23], Q [22], m [ 9],  5, 0x21e1cde6);
 	    Q1[25] = GG(Q1[21], Q1[24], Q1[23], Q1[22], m1[ 9],  5, 0x21e1cde6);
 
-//	    printf("%lf\n", (double)(j)/i*100 );
+
+//	    printf("corregidas: %ld\n", j);
+//	    printf("corregidas que pasan %ld\n", l);
+//	    printf("%lf\n", (double)(l)/j*100 );
 
 	    if ( (Q[25] ^ Q1[25]) != 0x00000000 ) 
 	    	continue;
@@ -796,7 +855,7 @@ int main (void){
 	
 	time_t end = time(NULL);
 
-	printf("%u seconds to execute \n", (uint32_t)(end-start));
+//	printf("%u seconds to execute \n", (uint32_t)(end-start));
 
 	return 0;
 }
