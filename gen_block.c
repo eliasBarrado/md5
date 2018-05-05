@@ -703,8 +703,8 @@ int block(void){
 		Q [50] = II(Q [46], Q [49], Q [48], Q [47], m [ 7], 10, 0x432aff97);
 		Q1[50] = II(Q1[46], Q1[49], Q1[48], Q1[47], m1[ 7], 10, 0x432aff97);
 
-		printf("Round 50\n");
 		printf("2^%2.2lf iterations\n", log(i)/log(2));
+		printf("Round 50\n");
 
 		if ( bit(Q[50],32) != (!bit(Q[48],32)) )
 			continue;
