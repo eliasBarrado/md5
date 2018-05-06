@@ -158,15 +158,11 @@ int block(void){
   	uint64_t j = 0;
   	uint64_t l = 0;
   	int round21 = 0;
-  	int contneg = 0;
-  	int contpos = 0;
 
 	while(1){
 
-		if(i%1000000000 == 0){
+		if(i%500000000 == 0){
 			printf("%d\n", round21);
-			printf("%d\n", contpos);
-			printf("%d\n", contneg);
 			printf("%8.8lf\n", (double)(round21)/i*100);
 			return 0;
 //			printf("%ld iterations\n\n", i);
@@ -362,9 +358,6 @@ int block(void){
 	    Q [17] = GG(Q [13], Q [16], Q [15], Q [14], m [ 1],  5, 0xf61e2562);
 	    Q1[17] = GG(Q1[13], Q1[16], Q1[15], Q1[14], m1[ 1],  5, 0xf61e2562);
 
-	    int neg = 0;
-	    int pos = 0;
-
 	    // Message modification
 
 	    if(bit(Q[17],16) != bit(Q[16],16)){
@@ -427,10 +420,8 @@ int block(void){
 			
 			if(bit(Q[2],7)){
 	    		m [ 1] = m[1] - 0x04000000;
-	    		neg=1; 
 	    	} else {
 	    		m [ 1] = m[1] + 0x04000000;
-	    		pos=1;
 	    	}
 
 	    	m1[ 1] = m[1];
@@ -453,34 +444,6 @@ int block(void){
 
 	    }
 
-/*	    if(bit(Q[17],4) != bit(Q[16],4)){
-			
-			if(bit(Q[2],11)){
-	    		m [ 1] = m[1] - 0x80000000; 
-	    	} else {
-	    		m [ 1] = m[1] + 0x80000000;
-	    	}
-
-	    	m1[ 1] = m[1];
-	    	
-			Q [ 2] = RL(m [1] + F(Q [ 1], QM0  , QM1  ) + QM2 + 0xe8c7b756, 12) + Q [1];
-			Q1[ 2] = RL(m1[1] + F(Q1[ 1], QM0  , QM1  ) + QM2 + 0xe8c7b756, 12) + Q1[1];	    	
-
-	    	m [ 2] = RR(Q [ 3] - Q [ 2], 17) - F(Q [ 2], Q [ 1], QM0   ) - QM1    - 0x242070db;
-	    	m [ 3] = RR(Q [ 4] - Q [ 3], 22) - F(Q [ 3], Q [ 2], Q [ 1]) - QM0    - 0xc1bdceee;
-	    	m [ 4] = RR(Q [ 5] - Q [ 4],  7) - F(Q [ 4], Q [ 3], Q [ 2]) - Q [ 1] - 0xf57c0faf;
-	    	m [ 5] = RR(Q [ 6] - Q [ 5], 12) - F(Q [ 5], Q [ 4], Q [ 3]) - Q [ 2] - 0x4787c62a;
-
-	    	m1[ 2] = RR(Q1[ 3] - Q1[ 2], 17) - F(Q1[ 2], Q1[ 1], QM0  )  - QM1    - 0x242070db;
-	    	m1[ 3] = RR(Q1[ 4] - Q1[ 3], 22) - F(Q1[ 3], Q1[ 2], Q1[ 1]) - QM0    - 0xc1bdceee;
-	    	m1[ 4] = RR(Q1[ 5] - Q1[ 4],  7) - F(Q1[ 4], Q1[ 3], Q1[ 2]) - Q1[ 1] - 0xf57c0faf;
-	    	m1[ 5] = RR(Q1[ 6] - Q1[ 5], 12) - F(Q1[ 5], Q1[ 4], Q1[ 3]) - Q1[ 2] - 0x4787c62a;
-
-	    	Q [17] = GG(Q [13], Q [16], Q [15], Q [14], m [ 1],  5, 0xf61e2562);
-	    	Q1[17] = GG(Q1[13], Q1[16], Q1[15], Q1[14], m1[ 1],  5, 0xf61e2562);
-
-	    }*/
-
 	    if ( bit(Q[17],32) || bit(Q[17],18) || bit(Q[17],16) != bit(Q[16],16) || bit(Q[17],4) != bit(Q[16],4) )
 	    	continue;
 
@@ -490,6 +453,39 @@ int block(void){
 		// Q[18] = 0.^. .... .... ..1. .... .... .... ....
 	    Q [18] = GG(Q [14], Q [17], Q [16], Q [15], m [ 6],  9, 0xc040b340);
 	    Q1[18] = GG(Q1[14], Q1[17], Q1[16], Q1[15], m1[ 6],  9, 0xc040b340);
+
+	    if( !bit(Q[18],18) ){
+
+	    	m [14] = m[14] + 0x00400000;
+	    	m1[14] = m[14] + 0x80000000;
+
+			Q [15] = RL(m [14] + F(Q [14], Q [13], Q [12]) + Q [11] + 0xa679438e, 17) + Q [14];
+			Q1[15] = RL(m1[14] + F(Q1[14], Q1[13], Q1[12]) + Q1[11] + 0xa679438e, 17) + Q1[14];
+
+			m [15] = RR(Q [16] - Q [15], 22) - F(Q [15], Q [14], Q [13]) - Q [12] - 0x49b40821; 
+			m1[15] = RR(Q1[16] - Q1[15], 22) - F(Q1[15], Q1[14], Q1[13]) - Q1[12] - 0x49b40821; 
+
+			Q [18] = GG(Q [14], Q [17], Q [16], Q [15], m [ 6],  9, 0xc040b340);
+	    	Q1[18] = GG(Q1[14], Q1[17], Q1[16], Q1[15], m1[ 6],  9, 0xc040b340);
+
+	    	
+	    }
+
+	    if( bit(Q[18],30) != bit(Q[17],30) ){
+
+	    	m [14] = m[14] + 0x00000004;
+	    	m1[14] = m[14] + 0x80000000;
+
+			Q [15] = RL(m [14] + F(Q [14], Q [13], Q [12]) + Q [11] + 0xa679438e, 17) + Q [14];
+			Q1[15] = RL(m1[14] + F(Q1[14], Q1[13], Q1[12]) + Q1[11] + 0xa679438e, 17) + Q1[14];
+
+			m [15] = RR(Q [16] - Q [15], 22) - F(Q [15], Q [14], Q [13]) - Q [12] - 0x49b40821; 
+			m1[15] = RR(Q1[16] - Q1[15], 22) - F(Q1[15], Q1[14], Q1[13]) - Q1[12] - 0x49b40821; 
+
+			Q [18] = GG(Q [14], Q [17], Q [16], Q [15], m [ 6],  9, 0xc040b340);
+	    	Q1[18] = GG(Q1[14], Q1[17], Q1[16], Q1[15], m1[ 6],  9, 0xc040b340);
+
+	    }
 
 	    if ( bit(Q[18],32) || bit(Q[18],30) != bit(Q[17],30) || !bit(Q[18],18) )
 	    	continue;
@@ -520,11 +516,6 @@ int block(void){
 	    // Q[21] = 0... .... .... ..^. .... .... .... ....
 	    Q [21] = GG(Q [17], Q [20], Q [19], Q [18], m [ 5],  5, 0xd62f105d);
 	    Q1[21] = GG(Q1[17], Q1[20], Q1[19], Q1[18], m1[ 5],  5, 0xd62f105d);
-
-	    if(pos)
-	    	contpos++;
-	    if(neg)
-	    	contneg++;
 
 	    round21++;
 
@@ -734,8 +725,8 @@ int block(void){
 		Q [50] = II(Q [46], Q [49], Q [48], Q [47], m [ 7], 10, 0x432aff97);
 		Q1[50] = II(Q1[46], Q1[49], Q1[48], Q1[47], m1[ 7], 10, 0x432aff97);
 
-		printf("2^%2.2lf iterations\n", log(i)/log(2));
-		printf("Round 50\n");
+//		printf("2^%2.2lf iterations\n", log(i)/log(2));
+//		printf("Round 50\n");
 
 		if ( bit(Q[50],32) != (!bit(Q[48],32)) )
 			continue;
@@ -747,7 +738,7 @@ int block(void){
 		Q [51] = II(Q [47], Q [50], Q [49], Q [48], m [14], 15, 0xab9423a7);
 		Q1[51] = II(Q1[47], Q1[50], Q1[49], Q1[48], m1[14], 15, 0xab9423a7);
 
-		printf("Round 51\n");
+//		printf("Round 51\n");
 
 		if ( bit(Q[51],32) != bit(Q[49],32) ) 
 	    	continue;
@@ -759,7 +750,7 @@ int block(void){
 		Q [52] = II(Q [48], Q [51], Q [50], Q [49], m [ 5], 21, 0xfc93a039);
 		Q1[52] = II(Q1[48], Q1[51], Q1[50], Q1[49], m1[ 5], 21, 0xfc93a039);
 
-		printf("Round 52\n");
+//		printf("Round 52\n");
 
 		if ( bit(Q[52],32) != bit(Q[50],32) ) 
 	    	continue;
@@ -771,7 +762,7 @@ int block(void){
 		Q [53] = II(Q [49], Q [52], Q [51], Q [50], m [12],  6, 0x655b59c3);
 		Q1[53] = II(Q1[49], Q1[52], Q1[51], Q1[50], m1[12],  6, 0x655b59c3);
 
-		printf("Round 53\n");
+//		printf("Round 53\n");
 
 		if ( bit(Q[53],32) != bit(Q[51],32) ) 
 	    	continue;
@@ -783,7 +774,7 @@ int block(void){
 		Q [54] = II(Q [50], Q [53], Q [52], Q [51], m [ 3], 10, 0x8f0ccc92);
 		Q1[54] = II(Q1[50], Q1[53], Q1[52], Q1[51], m1[ 3], 10, 0x8f0ccc92);
 
-		printf("Round 54\n");
+//		printf("Round 54\n");
 
 		if ( bit(Q[54],32) != bit(Q[52],32) ) 
 	    	continue;
@@ -795,6 +786,7 @@ int block(void){
 		Q [55] = II(Q [51], Q [54], Q [53], Q [52], m [10], 15, 0xffeff47d);
 		Q1[55] = II(Q1[51], Q1[54], Q1[53], Q1[52], m1[10], 15, 0xffeff47d);
 
+		printf("2^%2.2lf iterations\n", log(i)/log(2));
 		printf("Round 55\n");
 
 		if ( bit(Q[55],32) != bit(Q[53],32) ) 
