@@ -161,13 +161,13 @@ int block(void){
 
 	while(1){
 
-		if(i%500000000 == 0){
+/*		if(i%500000000 == 0){
 			printf("%d\n", round21);
 			printf("%8.8lf\n", (double)(round21)/i*100);
 			return 0;
 //			printf("%ld iterations\n\n", i);
 		}
-		i++;
+*/		i++;
 
 
 
@@ -190,7 +190,7 @@ int block(void){
 		// 			In the example Q[i] = Q[i] | ( Q[i-1] & 0x0000000f)  ----> 0000 .... 0000 0000 1111 1111 1111 ^^^^
 		//		
 		//
-		// Q1[i] is constructed satisfying 	∆Q[i] = Q1[i] - Q[i]
+		// Q1[i] is constructed satisfying 	∆Q[i] = Q1[i] - Q[i] ==> Q1 = Q ^ ∆Q
 		
 		// Q[1]  = .... .... .... .... .... .... .... .... 
 	    Q [1]  = frandom();
@@ -878,6 +878,8 @@ int block(void){
 		Q [60] = II(Q [56], Q [59], Q [58], Q [57], m [13],  21, 0x4e0811a1);
 		Q1[60] = II(Q1[56], Q1[59], Q1[58], Q1[57], m1[13],  21, 0x4e0811a1);
 
+		printf("Round 60\n");
+
 		if ( bit(Q[60],32) != (!bit(Q[58],32)) || bit(Q[60],26) )
 			continue;
 
@@ -888,8 +890,13 @@ int block(void){
 		Q [61] = II(Q [57], Q [60], Q [59], Q [58], m [ 4],  6, 0xf7537e82);
 		Q1[61] = II(Q1[57], Q1[60], Q1[59], Q1[58], m1[ 4],  6, 0xf7537e82);
 
-//		if ( (Q1[61] - Q[61]) != 0x80000000 ) 
-//	    	continue;
+		printf("Round 61\n");
+
+		if ( bit(Q[61],32) != bit(Q[59],32) || !bit(Q[61],26) ) 
+	    	continue;
+
+		if ( (Q1[61] - Q[61]) != 0x80000000 ) 
+	    	continue;
 
 		Q [62] = II(Q [58], Q [61], Q [60], Q [59], m [11], 10, 0xbd3af235);
 		Q1[62] = II(Q1[58], Q1[61], Q1[60], Q1[59], m1[11], 10, 0xbd3af235);
