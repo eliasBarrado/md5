@@ -157,17 +157,17 @@ int block(void){
   	uint64_t i = 1;
   	uint64_t j = 0;
   	uint64_t l = 0;
-  	int round21 = 0;
+  	int round23 = 0;
 
 	while(1){
 
-/*		if(i%500000000 == 0){
-			printf("%d\n", round21);
-			printf("%8.8lf\n", (double)(round21)/i*100);
+		if(i%1000000000 == 0){
+			printf("%d\n", round23);
+			printf("%8.8lf\n", (double)(round23)/i*100);
 			return 0;
 //			printf("%ld iterations\n\n", i);
 		}
-*/		i++;
+		i++;
 
 
 
@@ -552,7 +552,7 @@ int block(void){
 	    	Q1[19] = GG(Q1[15], Q1[18], Q1[17], Q1[16], m1[11], 14, 0x265e5a51);
 
 	    }
-	    
+
 	    if ( bit(Q[19],32) || bit(Q[19],18) )
 	    	continue;
 
@@ -572,8 +572,6 @@ int block(void){
 	    // Q[21] = 0... .... .... ..^. .... .... .... ....
 	    Q [21] = GG(Q [17], Q [20], Q [19], Q [18], m [ 5],  5, 0xd62f105d);
 	    Q1[21] = GG(Q1[17], Q1[20], Q1[19], Q1[18], m1[ 5],  5, 0xd62f105d);
-
-	    round21++;
 
 	    if ( bit(Q[21],32) || bit(Q[21],18) != bit(Q[20],18) )
 	    	continue;
@@ -595,6 +593,8 @@ int block(void){
 	    Q [23] = GG(Q [19], Q [22], Q [21], Q [20], m [15], 14, 0xd8a1e681);
 	    Q1[23] = GG(Q1[19], Q1[22], Q1[21], Q1[20], m1[15], 14, 0xd8a1e681);
 
+	    round23++;
+
 	    if ( bit(Q[23],32) )
 	    	continue;
 
@@ -615,7 +615,6 @@ int block(void){
 
 	    Q [25] = GG(Q [21], Q [24], Q [23], Q [22], m [ 9],  5, 0x21e1cde6);
 	    Q1[25] = GG(Q1[21], Q1[24], Q1[23], Q1[22], m1[ 9],  5, 0x21e1cde6);
-
 
 //	    printf("corregidas: %ld\n", j);
 //	    printf("corregidas que pasan %ld\n", l);
