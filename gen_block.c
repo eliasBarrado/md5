@@ -347,7 +347,6 @@ int block(void){
 	    if( (m1[15] - m[15]) != 0x00000000)
 	    	continue;
 
-
 	    // For each Q[i]:
 	    // 		the first  'if' checks the bitconditions
 	    //		the second 'if' checks the differential path
@@ -358,7 +357,6 @@ int block(void){
 	    Q1[17] = GG(Q1[13], Q1[16], Q1[15], Q1[14], m1[ 1],  5, 0xf61e2562);
 
 	    // Message modification
-
 	    if(bit(Q[17],16) != bit(Q[16],16)){
 			
 			if(bit(Q[2],23)){
@@ -384,9 +382,10 @@ int block(void){
 
 	    	Q [17] = GG(Q [13], Q [16], Q [15], Q [14], m [ 1],  5, 0xf61e2562);
 	    	Q1[17] = GG(Q1[13], Q1[16], Q1[15], Q1[14], m1[ 1],  5, 0xf61e2562);
-
+	    	
 	    }
 
+	    // Message modification
 	    if(bit(Q[17],18)){
 			
 			if(bit(Q[2],25)){
@@ -412,9 +411,10 @@ int block(void){
 
 	    	Q [17] = GG(Q [13], Q [16], Q [15], Q [14], m [ 1],  5, 0xf61e2562);
 	    	Q1[17] = GG(Q1[13], Q1[16], Q1[15], Q1[14], m1[ 1],  5, 0xf61e2562);
-
+	    	
 	    }
 
+	    // Message modification
 	    if(bit(Q[17],32)){
 			
 			if(bit(Q[2],7)){
@@ -440,7 +440,7 @@ int block(void){
 
 	    	Q [17] = GG(Q [13], Q [16], Q [15], Q [14], m [ 1],  5, 0xf61e2562);
 	    	Q1[17] = GG(Q1[13], Q1[16], Q1[15], Q1[14], m1[ 1],  5, 0xf61e2562);
-
+	    	
 	    }
 
 	    if ( bit(Q[17],32) || bit(Q[17],18) || bit(Q[17],16) != bit(Q[16],16) || bit(Q[17],4) != bit(Q[16],4) )
@@ -453,6 +453,7 @@ int block(void){
 	    Q [18] = GG(Q [14], Q [17], Q [16], Q [15], m [ 6],  9, 0xc040b340);
 	    Q1[18] = GG(Q1[14], Q1[17], Q1[16], Q1[15], m1[ 6],  9, 0xc040b340);
 
+	    // Message modification
 	    if( !bit(Q[18],18) ){
 
 	    	m [14] = m[14] + 0x00400000;
@@ -466,10 +467,10 @@ int block(void){
 
 			Q [18] = GG(Q [14], Q [17], Q [16], Q [15], m [ 6],  9, 0xc040b340);
 	    	Q1[18] = GG(Q1[14], Q1[17], Q1[16], Q1[15], m1[ 6],  9, 0xc040b340);
-
 	    	
 	    }
 
+	    // Message modification
 	    if( bit(Q[18],30) != bit(Q[17],30) ){
 
 	    	m [14] = m[14] + 0x00000004;
@@ -483,9 +484,10 @@ int block(void){
 
 			Q [18] = GG(Q [14], Q [17], Q [16], Q [15], m [ 6],  9, 0xc040b340);
 	    	Q1[18] = GG(Q1[14], Q1[17], Q1[16], Q1[15], m1[ 6],  9, 0xc040b340);
-
+	    	
 	    }
 
+	    // Message modification
 	    if( bit(Q[18],32) ){
 
 	    	m [2] = m[2] + 0x00000020;
@@ -514,7 +516,7 @@ int block(void){
 
 	    	Q [18] = GG(Q [14], Q [17], Q [16], Q [15], m [ 6],  9, 0xc040b340);
 	    	Q1[18] = GG(Q1[14], Q1[17], Q1[16], Q1[15], m1[ 6],  9, 0xc040b340);
-
+	    	
 	    }
 
 	    if ( bit(Q[18],32) || bit(Q[18],30) != bit(Q[17],30) || !bit(Q[18],18) )
@@ -527,6 +529,7 @@ int block(void){
 	    Q [19] = GG(Q [15], Q [18], Q [17], Q [16], m [11], 14, 0x265e5a51);
 	    Q1[19] = GG(Q1[15], Q1[18], Q1[17], Q1[16], m1[11], 14, 0x265e5a51);
 
+	    // Message modification
 	    if( bit(Q[19],18) ){
 
 	    	m [9] = m[9] + 0x00400000;
@@ -549,9 +552,10 @@ int block(void){
 
 	    	Q [19] = GG(Q [15], Q [18], Q [17], Q [16], m [11], 14, 0x265e5a51);
 	    	Q1[19] = GG(Q1[15], Q1[18], Q1[17], Q1[16], m1[11], 14, 0x265e5a51);
-
+	    	
 	    }
 
+	    // Message modification
 	    if( bit(Q[19],32) ){
 
 	    	m [12] = m[12] + 0x00000010;
@@ -574,7 +578,7 @@ int block(void){
 
 	    	Q [19] = GG(Q [15], Q [18], Q [17], Q [16], m [11], 14, 0x265e5a51);
 	   	 	Q1[19] = GG(Q1[15], Q1[18], Q1[17], Q1[16], m1[11], 14, 0x265e5a51);
-
+	   	 	
 	    }
 
 	    if ( bit(Q[19],32) || bit(Q[19],18) )
@@ -587,6 +591,7 @@ int block(void){
 	    Q [20] = GG(Q [16], Q [19], Q [18], Q [17], m [ 0], 20, 0xe9b6c7aa);
 	    Q1[20] = GG(Q1[16], Q1[19], Q1[18], Q1[17], m1[ 0], 20, 0xe9b6c7aa);
 
+	    // Message modification
 	    if( bit(Q[20],32) ){
 
 	    	m [12] = m[12] + 0x40000000;
@@ -609,7 +614,7 @@ int block(void){
 
 	    	Q [20] = GG(Q [16], Q [19], Q [18], Q [17], m [ 0], 20, 0xe9b6c7aa);
 	    	Q1[20] = GG(Q1[16], Q1[19], Q1[18], Q1[17], m1[ 0], 20, 0xe9b6c7aa);
-
+	    	
 	    }
    
 	    if ( bit(Q[20],32) )
@@ -842,8 +847,6 @@ int block(void){
 		Q [51] = II(Q [47], Q [50], Q [49], Q [48], m [14], 15, 0xab9423a7);
 		Q1[51] = II(Q1[47], Q1[50], Q1[49], Q1[48], m1[14], 15, 0xab9423a7);
 
-//		printf("Round 51\n");
-
 		if ( bit(Q[51],32) != bit(Q[49],32) ) 
 	    	continue;
 
@@ -853,8 +856,6 @@ int block(void){
 		// Q[52] = m... .... .... .... .... .... .... ....    
 		Q [52] = II(Q [48], Q [51], Q [50], Q [49], m [ 5], 21, 0xfc93a039);
 		Q1[52] = II(Q1[48], Q1[51], Q1[50], Q1[49], m1[ 5], 21, 0xfc93a039);
-
-//		printf("Round 52\n");
 
 		if ( bit(Q[52],32) != bit(Q[50],32) ) 
 	    	continue;
@@ -866,8 +867,6 @@ int block(void){
 		Q [53] = II(Q [49], Q [52], Q [51], Q [50], m [12],  6, 0x655b59c3);
 		Q1[53] = II(Q1[49], Q1[52], Q1[51], Q1[50], m1[12],  6, 0x655b59c3);
 
-//		printf("Round 53\n");
-
 		if ( bit(Q[53],32) != bit(Q[51],32) ) 
 	    	continue;
 
@@ -877,8 +876,6 @@ int block(void){
 	    // Q[54] = m... .... .... .... .... .... .... ....
 		Q [54] = II(Q [50], Q [53], Q [52], Q [51], m [ 3], 10, 0x8f0ccc92);
 		Q1[54] = II(Q1[50], Q1[53], Q1[52], Q1[51], m1[ 3], 10, 0x8f0ccc92);
-
-//		printf("Round 54\n");
 
 		if ( bit(Q[54],32) != bit(Q[52],32) ) 
 	    	continue;
@@ -999,13 +996,23 @@ int block(void){
 	    if(DEBUG){
 	    	printf("PRINTING Q[i], Q1[i]:\n");
 	    	for(int i = 1; i < 65; i++){
-	    	printf("Q [%2.2d]  ",i);
-	    	print_bin(Q[i]);
-	    	printf("Q1[%2.2d]  ",i);
-	    	print_bin(Q1[i]);
-	    	printf("\n");
+	    		printf("Q [%2.2d]  ",i);
+	    		print_bin(Q[i]);
+	    		printf("Q1[%2.2d]  ",i);
+	    		print_bin(Q1[i]);
+	    		printf("\n");
 	    	}
 		}
+
+		if(DEBUG){
+			printf("Printing message differences\n");
+			for( int i = 0; i < 16; i++){
+				printf("δm[%2.2d]: ",i);
+				printf_bsdr( m1[i]-m[i], 0x00000000 );
+				printf("\n");
+			}
+		}
+		
 		
 
 	    printf("Found it in %ld iterations\n", i);
