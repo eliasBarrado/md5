@@ -156,14 +156,14 @@ int block(void){
 
   	uint64_t i = 1;
   	uint64_t j = 0;
-  	int round25 = 0;
+  	int round23 = 0;
   	int cont = 0;
 
 	while(1){
 
 		if(i%100000000 == 0){
-			printf("%d\n", round25);
-			printf("%8.8lf\n", (double)(round25)/i*100);
+			printf("%d\n", round23);
+			printf("%8.8lf\n", (double)(round23)/i*100);
 			printf("%d\n", cont);
 			return 0;
 		}
@@ -627,8 +627,8 @@ int block(void){
 	    // Q[21] = 0... .... .... ..^. .... .... .... ....
 	    Q [21] = GG(Q [17], Q [20], Q [19], Q [18], m [ 5],  5, 0xd62f105d);
 	    Q1[21] = GG(Q1[17], Q1[20], Q1[19], Q1[18], m1[ 5],  5, 0xd62f105d);
-	    
-	    if ( bit(Q[21],18) != bit(Q[20],18) ) {
+// no funciona	    
+/*	    if ( bit(Q[21],18) != bit(Q[20],18) ) {
 	    	k=1;
 	    	m [12] = m[12] - 0x01000000;
 	    	m1[12] = m[12];
@@ -665,16 +665,20 @@ int block(void){
 	    	Q [21] = GG(Q [17], Q [20], Q [19], Q [18], m [ 5],  5, 0xd62f105d);	
 	    	Q1[21] = GG(Q1[17], Q1[20], Q1[19], Q1[18], m1[ 5],  5, 0xd62f105d);
 
-	    } 
+	    } */
+
+
+	    if( bit(Q[21],32) ){
+	    	
+	    	m [3] = m[3] + 0x00000008;
+	    	m1[3] = m[3];
+	    }
 
 	    if ( bit(Q[21],32) || bit(Q[21],18) != bit(Q[20],18) )
 	    	continue;
 
 	    if ( (Q[21] ^ Q1[21]) != 0x80000000 ) 
 	    	continue;
-
-	    if(k)
-	    	cont++;
 
 	    // Q[22] = 0... .... .... .... .... .... .... ....
 	    Q [22] = GG(Q [18], Q [21], Q [20], Q [19], m [10],  9, 0x2441453);
@@ -696,9 +700,14 @@ int block(void){
 	    if ( (Q[23] ^ Q1[23]) != 0x00000000 ) 
 	    	continue;
 
-	    // Q[24] = 0... .... .... .... .... .... .... ....
+	    // Q[24] = 1... .... .... .... .... .... .... ....
 	    Q [24] = GG(Q [20], Q [23], Q [22], Q [21], m [ 4], 20, 0xe7d3fbc8);
 	    Q1[24] = GG(Q1[20], Q1[23], Q1[22], Q1[21], m1[ 4], 20, 0xe7d3fbc8); 
+
+	    if(k)
+	    	cont++;
+
+	    round23++;
 	    
 	    if ( !bit(Q[24],32) )
 	    	continue;
@@ -710,8 +719,6 @@ int block(void){
 
 	    Q [25] = GG(Q [21], Q [24], Q [23], Q [22], m [ 9],  5, 0x21e1cde6);
 	    Q1[25] = GG(Q1[21], Q1[24], Q1[23], Q1[22], m1[ 9],  5, 0x21e1cde6);
-
-	    round25++;
 
 //	    printf("corregidas: %ld\n", j);
 //	    printf("corregidas que pasan %ld\n", l);
