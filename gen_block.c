@@ -913,7 +913,7 @@ int block(void){
 //		printf("2^%2.2lf iterations\n", log(i)/log(2));
 //		printf("Round 50\n");
 
-		if ( bit(Q[50],32) != (!bit(Q[48],32)) )
+		if ( bit(Q[50],32) == bit(Q[48],32) )
 			continue;
 
 		if ( (Q1[50] - Q[50]) != 0x80000000 ) 
