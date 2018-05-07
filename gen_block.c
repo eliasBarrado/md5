@@ -950,7 +950,7 @@ int block(void){
 
 		printf("Round 60\n");
 
-		if ( bit(Q[60],32) != (!bit(Q[58],32)) || bit(Q[60],26) )
+		if ( ( bit(Q[60],32) == bit(Q[58],32) ) || bit(Q[60],26) )
 			continue;
 
 		if ( (Q1[60] - Q[60]) != 0x80000000 ) 
