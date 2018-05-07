@@ -748,8 +748,7 @@ int block(void){
 	    if ( (Q[24] ^ Q1[24]) != 0x00000000 ) 
 	    	continue;
 
-	    // No bitconditions for Q[25]...Q[45]
-
+	    // No bitconditions for Q[25]...Q[47]
 	    Q [25] = GG(Q [21], Q [24], Q [23], Q [22], m [ 9],  5, 0x21e1cde6);
 	    Q1[25] = GG(Q1[21], Q1[24], Q1[23], Q1[22], m1[ 9],  5, 0x21e1cde6);
 
@@ -970,8 +969,8 @@ int block(void){
 		Q [55] = II(Q [51], Q [54], Q [53], Q [52], m [10], 15, 0xffeff47d);
 		Q1[55] = II(Q1[51], Q1[54], Q1[53], Q1[52], m1[10], 15, 0xffeff47d);
 
-		printf("2^%2.2lf iterations\n", log(i)/log(2));
-		printf("Round 55\n");
+//		printf("2^%2.2lf iterations\n", log(i)/log(2));
+//		printf("Round 55\n");
 
 		if ( bit(Q[55],32) != bit(Q[53],32) ) 
 	    	continue;
@@ -983,7 +982,7 @@ int block(void){
 		Q [56] = II(Q [52], Q [55], Q [54], Q [53], m [ 1], 21, 0x85845dd1);
 		Q1[56] = II(Q1[52], Q1[55], Q1[54], Q1[53], m1[ 1], 21, 0x85845dd1);
 
-		printf("Round 56\n");
+//		printf("Round 56\n");
 
 		if ( bit(Q[56],32) != bit(Q[54],32) ) 
 	    	continue;
@@ -995,7 +994,7 @@ int block(void){
 		Q [57] = II(Q [53], Q [56], Q [55], Q [54], m [ 8],  6, 0x6fa87e4f);
 		Q1[57] = II(Q1[53], Q1[56], Q1[55], Q1[54], m1[ 8],  6, 0x6fa87e4f);
 
-		printf("Round 57\n");
+//		printf("Round 57\n");
 
 		if ( bit(Q[57],32) != bit(Q[55],32) ) 
 	    	continue;
@@ -1007,7 +1006,7 @@ int block(void){
 		Q [58] = II(Q [54], Q [57], Q [56], Q [55], m [15], 10, 0xfe2ce6e0);
 		Q1[58] = II(Q1[54], Q1[57], Q1[56], Q1[55], m1[15], 10, 0xfe2ce6e0);
 
-		printf("Round 58\n");
+//		printf("Round 58\n");
 
 		if ( bit(Q[58],32) != bit(Q[56],32) ) 
 	    	continue;
@@ -1019,7 +1018,7 @@ int block(void){
 		Q [59] = II(Q [55], Q [58], Q [57], Q [56], m [ 6], 15, 0xa3014314);
 		Q1[59] = II(Q1[55], Q1[58], Q1[57], Q1[56], m1[ 6], 15, 0xa3014314);
 
-		printf("Round 59\n");
+//		printf("Round 59\n");
 
 		if ( bit(Q[59],32) != bit(Q[57],32) ) 
 	    	continue;
@@ -1031,6 +1030,7 @@ int block(void){
 		Q [60] = II(Q [56], Q [59], Q [58], Q [57], m [13],  21, 0x4e0811a1);
 		Q1[60] = II(Q1[56], Q1[59], Q1[58], Q1[57], m1[13],  21, 0x4e0811a1);
 
+		printf("2^%2.2lf iterations\n", log(i)/log(2));
 		printf("Round 60\n");
 
 		if ( ( bit(Q[60],32) == bit(Q[58],32) ) || bit(Q[60],26) )
@@ -1054,8 +1054,18 @@ int block(void){
 		Q [62] = II(Q [58], Q [61], Q [60], Q [59], m [11], 10, 0xbd3af235);
 		Q1[62] = II(Q1[58], Q1[61], Q1[60], Q1[59], m1[11], 10, 0xbd3af235);
 
+		printf("Round 62\n");
+
+		if( bit(Q[62],32) != bit(Q[60],32) || bit(Q[62],26) )
+			continue;
+
 		Q [63] = II(Q [59], Q [62], Q [61], Q [60], m [ 2], 15, 0x2ad7d2bb);
 		Q1[63] = II(Q1[59], Q1[62], Q1[61], Q1[60], m1[ 2], 15, 0x2ad7d2bb);
+
+		printf("Round 63\n");
+
+		if( bit(Q[63],32) != bit(Q[61],32) || bit(Q[63],26) )
+			continue;
 
 		Q [64] = II(Q [60], Q [63], Q [62], Q [61], m [ 9], 21, 0xeb86d391);
 		Q1[64] = II(Q1[60], Q1[63], Q1[62], Q1[61], m1[ 9], 21, 0xeb86d391);
