@@ -161,12 +161,12 @@ int block(void){
 
 	while(1){
 
-		if(i%500000000 == 0){
+/*		if(i%500000000 == 0){
 			printf("%d\n", round30);
 			printf("%8.8lf\n", (double)(round30)/i*100);
 			printf("%d\n", cont);
 			return 0;
-		}
+		}*/
 		i++;
 
 
