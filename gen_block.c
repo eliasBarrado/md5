@@ -156,14 +156,14 @@ int block(void){
 
   	uint64_t i = 1;
   	uint64_t j = 0;
-  	int round23 = 0;
+  	int round30 = 0;
   	int cont = 0;
 
 	while(1){
 
 		if(i%100000000 == 0){
-			printf("%d\n", round23);
-			printf("%8.8lf\n", (double)(round23)/i*100);
+			printf("%d\n", round30);
+			printf("%8.8lf\n", (double)(round30)/i*100);
 			printf("%d\n", cont);
 			return 0;
 		}
@@ -629,7 +629,7 @@ int block(void){
 	    Q1[21] = GG(Q1[17], Q1[20], Q1[19], Q1[18], m1[ 5],  5, 0xd62f105d);
 // no funciona	    
 /*	    if ( bit(Q[21],18) != bit(Q[20],18) ) {
-	    	k=1;
+	    	
 	    	m [12] = m[12] - 0x01000000;
 	    	m1[12] = m[12];
 
@@ -667,11 +667,24 @@ int block(void){
 
 	    } */
 
-
+	    // Message modification
 	    if( bit(Q[21],32) ){
 	    	
 	    	m [3] = m[3] + 0x00000008;
 	    	m1[3] = m[3];
+
+	    	Q [ 4] = RL( m [ 3] + F(Q [ 3], Q [ 2], Q [ 1]) + QM0 + 0xc1bdceee, 22 ) + Q [3];
+	    	Q1[ 4] = RL( m1[ 3] + F(Q1[ 3], Q1[ 2], Q1[ 1]) + QM0 + 0xc1bdceee, 22 ) + Q1[3];
+
+	    	m [ 5] = m[ 5] - 0x02000000;
+	    	m1[ 5] = m[5];
+
+	    	m [ 7] = m[ 7] - 0x02000000;
+	    	m1[ 7] = m[ 7];
+
+	    	Q [21] = GG(Q [17], Q [20], Q [19], Q [18], m [ 5],  5, 0xd62f105d);	
+	    	Q1[21] = GG(Q1[17], Q1[20], Q1[19], Q1[18], m1[ 5],  5, 0xd62f105d);
+
 	    }
 
 	    if ( bit(Q[21],32) || bit(Q[21],18) != bit(Q[20],18) )
@@ -703,11 +716,6 @@ int block(void){
 	    // Q[24] = 1... .... .... .... .... .... .... ....
 	    Q [24] = GG(Q [20], Q [23], Q [22], Q [21], m [ 4], 20, 0xe7d3fbc8);
 	    Q1[24] = GG(Q1[20], Q1[23], Q1[22], Q1[21], m1[ 4], 20, 0xe7d3fbc8); 
-
-	    if(k)
-	    	cont++;
-
-	    round23++;
 	    
 	    if ( !bit(Q[24],32) )
 	    	continue;
@@ -753,6 +761,12 @@ int block(void){
 
 	    Q [30] = GG(Q [26], Q [29], Q [28], Q [27], m [ 2],  9, 0xfcefa3f8);
 	    Q1[30] = GG(Q1[26], Q1[29], Q1[28], Q1[27], m1[ 2],  9, 0xfcefa3f8);
+
+	    if(k){
+	    	cont++;
+	    }
+
+	    round30++;
 
 	    if ( (Q[30] ^ Q1[30]) != 0x00000000 ) 
 	    	continue;
@@ -1085,7 +1099,7 @@ int main (void){
 	
 	time_t end = time(NULL);
 
-//	printf("%u seconds to execute \n", (uint32_t)(end-start));
+	printf("%u seconds to execute \n", (uint32_t)(end-start));
 
 	return 0;
 }
