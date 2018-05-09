@@ -100,14 +100,14 @@ void printf_bsdr(uint32_t a, uint32_t b){
 
 	for (int i=0; i<32; i++){
 		if( a_bin[i] - b_bin[i] == 1 ){
-			printf("%d ",i);
+			printf("%3d ",i);
 		}
 
 		if( a_bin[i] - b_bin[i] == -1 ){
 			if(i==0){
-				printf("-0 ");
+				printf(" -0 ");
 			}else{
-				printf("%d ", -i);
+				printf("%3.d ", -i);
 			}
 		}
 	}
@@ -351,7 +351,8 @@ int block(void){
 	    if( (m1[15] - m[15]) != 0x00000000)
 	    	continue;
 
-	 
+
+	    
 	    
 
 	    // For each Q[i]:
@@ -512,7 +513,7 @@ int block(void){
 	    	m [ 4] = RR(Q [ 5] - Q [ 4],  7) - F(Q [ 4], Q [ 3], Q [ 2]) - Q [ 1] - 0xf57c0faf;
 	    	m1[ 4] = RR(Q1[ 5] - Q1[ 4],  7) - F(Q1[ 4], Q1[ 3], Q1[ 2]) - Q1[ 1] - 0xf57c0faf;
 
-	    	m [ 5]  = RR(Q [ 6] - Q [ 5], 12) - F(Q [ 5], Q [ 4], Q [ 3]) - Q [ 2] - 0x4787c62a;
+	    	m [ 5] = RR(Q [ 6] - Q [ 5], 12) - F(Q [ 5], Q [ 4], Q [ 3]) - Q [ 2] - 0x4787c62a;
 	    	m1[ 5] = RR(Q1[ 6] - Q1[ 5], 12) - F(Q1[ 5], Q1[ 4], Q1[ 3]) - Q1[ 2] - 0x4787c62a;
 
 	    	m [6] = m[6] - 0x00200000;
@@ -633,7 +634,7 @@ int block(void){
 	    // Q[21] = 0... .... .... ..^. .... .... .... ....
 	    Q [21] = GG(Q [17], Q [20], Q [19], Q [18], m [ 5],  5, 0xd62f105d);
 	    Q1[21] = GG(Q1[17], Q1[20], Q1[19], Q1[18], m1[ 5],  5, 0xd62f105d);
-// no funciona	    
+// does not work	    
 /*	    if ( bit(Q[21],18) != bit(Q[20],18) ) {
 	    	
 	    	m [12] = m[12] - 0x01000000;
@@ -683,7 +684,7 @@ int block(void){
 	    	Q1[ 4] = RL( m1[ 3] + F(Q1[ 3], Q1[ 2], Q1[ 1]) + QM0 + 0xc1bdceee, 22 ) + Q1[3];
 
 	    	m [ 5] = m[ 5] - 0x02000000;
-	    	m1[ 5] = m[5];
+	    	m1[ 5] = m[ 5];
 
 	    	m [ 7] = m[ 7] - 0x02000000;
 	    	m1[ 7] = m[ 7];
@@ -752,10 +753,6 @@ int block(void){
 
 	    Q [25] = GG(Q [21], Q [24], Q [23], Q [22], m [ 9],  5, 0x21e1cde6);
 	    Q1[25] = GG(Q1[21], Q1[24], Q1[23], Q1[22], m1[ 9],  5, 0x21e1cde6);
-
-//	    printf("corregidas: %ld\n", j);
-//	    printf("corregidas que pasan %ld\n", l);
-//	    printf("%lf\n", (double)(l)/j*100 );
 
 	    if ( (Q[25] ^ Q1[25]) != 0x00000000 ) 
 	    	continue;
@@ -917,6 +914,40 @@ int block(void){
 		Q [50] = II(Q [46], Q [49], Q [48], Q [47], m [ 7], 10, 0x432aff97);
 		Q1[50] = II(Q1[46], Q1[49], Q1[48], Q1[47], m1[ 7], 10, 0x432aff97);
 
+		if(DEBUG){
+	    	printf("Printing ∆Q[i] to check if it follows the differential path\n");
+	    	printf("PRINTING BSDR: ∆Q[i]: \n");
+	    	for(int i = 1; i < 65; i++){
+	    		printf("∆Q[%2d]:  ",i);
+	    		printf_bsdr(Q1[i],Q[i]);
+	    	}
+	    	printf("\n");
+	    }
+
+	    if(DEBUG){
+	    	printf("PRINTING Q[i], Q1[i]:\n");
+	    	for(int i = 1; i < 65; i++){
+	    		printf("Q [%2d]:  ",i);
+	    		print_bin(Q[i]);
+	    		printf("Q1[%2d]:  ",i);
+	    		print_bin(Q1[i]);
+	    		printf("\n");
+	    	}
+		}
+
+		if(DEBUG){
+			printf("Printing message differences\n");
+			for( int i = 0; i < 16; i++){
+				printf("δm[%2d]: ",i);
+				printf_bsdr( m1[i]-m[i], 0x00000000 );
+				printf("\n");
+			}
+		}
+
+		printf("Found it in 2^%2.2lf iterations\n", log(i)/log(2));
+	 
+	 	return 0;
+
 //		printf("2^%2.2lf iterations\n", log(i)/log(2));
 //		printf("Round 50\n");
 
@@ -1069,7 +1100,7 @@ int block(void){
 	    	printf("Printing ∆Q[i] to check if it follows the differential path\n");
 	    	printf("PRINTING BSDR: ∆Q[i]: \n");
 	    	for(int i = 1; i < 65; i++){
-	    		printf("%2.2d  ",i);
+	    		printf("∆Q[%2d]:  ",i);
 	    		printf_bsdr(Q1[i],Q[i]);
 	    	}
 	    	printf("\n");
@@ -1079,9 +1110,9 @@ int block(void){
 	    if(DEBUG){
 	    	printf("PRINTING Q[i], Q1[i]:\n");
 	    	for(int i = 1; i < 65; i++){
-	    		printf("Q [%2.2d]  ",i);
+	    		printf("Q [%2d]:  ",i);
 	    		print_bin(Q[i]);
-	    		printf("Q1[%2.2d]  ",i);
+	    		printf("Q1[%2d]:  ",i);
 	    		print_bin(Q1[i]);
 	    		printf("\n");
 	    	}
@@ -1090,7 +1121,7 @@ int block(void){
 		if(DEBUG){
 			printf("Printing message differences\n");
 			for( int i = 0; i < 16; i++){
-				printf("δm[%2.2d]: ",i);
+				printf("δm[%2d]: ",i);
 				printf_bsdr( m1[i]-m[i], 0x00000000 );
 				printf("\n");
 			}
