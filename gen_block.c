@@ -132,6 +132,29 @@ uint32_t bit(uint32_t a, uint32_t b) {
       return (a & mask_bit[b]) >> (b-1);
 }
 
+
+// Write block to disk - Returns 0 if ok, 1 if cannot open, 2 if write error
+int write_block(char *fname,void *block) {
+  
+  FILE *f;
+  size_t wrt;
+
+  f = fopen(fname,"wb");
+  if (f == NULL) 
+    return 1;
+  
+  wrt = fwrite(block,1,64,f);
+  
+  fclose(f);
+  
+  if (wrt == 64) 
+    return 0;
+  
+  return 2;
+
+}
+
+
 //Default init hash values
 uint32_t IV1=0x67452301; 
 uint32_t IV2=0xefcdab89;
@@ -962,8 +985,8 @@ int block(void){
 		Q [55] = II(Q [51], Q [54], Q [53], Q [52], m [10], 15, 0xffeff47d);
 		Q1[55] = II(Q1[51], Q1[54], Q1[53], Q1[52], m1[10], 15, 0xffeff47d);
 
-//		printf("2^%2.2lf iterations\n", log(i)/log(2));
-//		printf("Round 55\n");
+		printf("2^%2.2lf iterations\n", log(i)/log(2));
+		printf("Round 55\n");
 
 		if ( bit(Q[55],32) != bit(Q[53],32) ) 
 	    	continue;
@@ -975,7 +998,7 @@ int block(void){
 		Q [56] = II(Q [52], Q [55], Q [54], Q [53], m [ 1], 21, 0x85845dd1);
 		Q1[56] = II(Q1[52], Q1[55], Q1[54], Q1[53], m1[ 1], 21, 0x85845dd1);
 
-//		printf("Round 56\n");
+		printf("Round 56\n");
 
 		if ( bit(Q[56],32) != bit(Q[54],32) ) 
 	    	continue;
@@ -987,7 +1010,7 @@ int block(void){
 		Q [57] = II(Q [53], Q [56], Q [55], Q [54], m [ 8],  6, 0x6fa87e4f);
 		Q1[57] = II(Q1[53], Q1[56], Q1[55], Q1[54], m1[ 8],  6, 0x6fa87e4f);
 
-//		printf("Round 57\n");
+		printf("Round 57\n");
 
 		if ( bit(Q[57],32) != bit(Q[55],32) ) 
 	    	continue;
@@ -999,7 +1022,7 @@ int block(void){
 		Q [58] = II(Q [54], Q [57], Q [56], Q [55], m [15], 10, 0xfe2ce6e0);
 		Q1[58] = II(Q1[54], Q1[57], Q1[56], Q1[55], m1[15], 10, 0xfe2ce6e0);
 
-//		printf("Round 58\n");
+		printf("Round 58\n");
 
 		if ( bit(Q[58],32) != bit(Q[56],32) ) 
 	    	continue;
@@ -1011,7 +1034,7 @@ int block(void){
 		Q [59] = II(Q [55], Q [58], Q [57], Q [56], m [ 6], 15, 0xa3014314);
 		Q1[59] = II(Q1[55], Q1[58], Q1[57], Q1[56], m1[ 6], 15, 0xa3014314);
 
-//		printf("Round 59\n");
+		printf("Round 59\n");
 
 		if ( bit(Q[59],32) != bit(Q[57],32) ) 
 	    	continue;
@@ -1026,11 +1049,11 @@ int block(void){
 		printf("2^%2.2lf iterations\n", log(i)/log(2));
 		printf("Round 60\n");
 
-//		if ( ( bit(Q[60],32) == bit(Q[58],32) ) || bit(Q[60],26) )
-//			continue;
+		if ( ( bit(Q[60],32) == bit(Q[58],32) ) || bit(Q[60],26) )
+			continue;
 
-//		if ( (Q1[60] - Q[60]) != 0x80000000 ) 
-//	    	continue;
+		if ( (Q1[60] - Q[60]) != 0x80000000 ) 
+	    	continue;
 
 	    // Q[61] = m... ..1. .... .... .... .... .... ....
 		Q [61] = II(Q [57], Q [60], Q [59], Q [58], m [ 4],  6, 0xf7537e82);
@@ -1038,27 +1061,27 @@ int block(void){
 
 		printf("Round 61\n");
 
-//		if ( bit(Q[61],32) != bit(Q[59],32) || !bit(Q[61],26) ) 
-//	    	continue;
+		if ( bit(Q[61],32) != bit(Q[59],32) || !bit(Q[61],26) ) 
+	    	continue;
 
-//		if ( (Q1[61] - Q[61]) != 0x80000000 ) 
-//	    	continue;
+		if ( (Q1[61] - Q[61]) != 0x80000000 ) 
+	    	continue;
 
 		Q [62] = II(Q [58], Q [61], Q [60], Q [59], m [11], 10, 0xbd3af235);
 		Q1[62] = II(Q1[58], Q1[61], Q1[60], Q1[59], m1[11], 10, 0xbd3af235);
 
 		printf("Round 62\n");
 
-//		if( bit(Q[62],32) != bit(Q[60],32) || bit(Q[62],26) )
-//			continue;
+		if( bit(Q[62],32) != bit(Q[60],32) || bit(Q[62],26) )
+			continue;
 
 		Q [63] = II(Q [59], Q [62], Q [61], Q [60], m [ 2], 15, 0x2ad7d2bb);
 		Q1[63] = II(Q1[59], Q1[62], Q1[61], Q1[60], m1[ 2], 15, 0x2ad7d2bb);
 
 		printf("Round 63\n");
 
-//		if( bit(Q[63],32) != bit(Q[61],32) || bit(Q[63],26) )
-//			continue;
+		if( bit(Q[63],32) != bit(Q[61],32) || bit(Q[63],26) )
+			continue;
 
 		Q [64] = II(Q [60], Q [63], Q [62], Q [61], m [ 9], 21, 0xeb86d391);
 		Q1[64] = II(Q1[60], Q1[63], Q1[62], Q1[61], m1[ 9], 21, 0xeb86d391);
@@ -1102,9 +1125,33 @@ int block(void){
 				printf("\n");
 			}
 		}
+
+
 		
 		
-	    printf("Found it in 2^%2.2lf iterations\n", log(i)/log(2));
+	    printf("Found it in 2^%2.2lf iterations\n\n", log(i)/log(2));
+
+
+	    printf("M1:\n");
+	    for(int i=0; i<16; i++){
+	    	uint8_t *p;
+	    	p=(uint8_t *)&m[i];
+	    	printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3]);	
+	    }
+	    printf("\n\n");
+
+	    printf("M2:\n");
+	    for(int i=0; i<16; i++){
+	    	uint8_t *p;
+	    	p=(uint8_t *)&m1[i];
+	    	printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3]);	
+	    }
+	    printf("\n\n");
+
+	    write_block("m1_file", (void *)m);
+	    write_block("m2_file", (void *)m1);
+
+
 	    return 0;
 
 	}
