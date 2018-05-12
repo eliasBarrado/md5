@@ -1151,6 +1151,31 @@ int block(void){
 	    write_block("m1_file", (void *)m);
 	    write_block("m2_file", (void *)m1);
 
+	    //Last sufficient conditions  
+       if (bit(Q[64],6)) 
+    	continue;
+
+       if (bit(Q[64],26)) 
+        continue;
+
+       if (bit(Q[64],27)) 
+        continue;
+
+       if (!bit(Q[63],26))
+        continue;
+
+       if (bit(Q[63],27)) 
+        continue;  
+
+       if (bit(Q[62],26)) 
+        continue;
+
+       if (bit(Q[64],32) != bit(Q[63],32)) 
+        continue;
+
+       if (bit(Q[63],32) != bit(Q[62],32)) 
+        continue;
+
 
 	    return 0;
 
