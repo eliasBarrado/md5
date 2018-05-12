@@ -133,10 +133,10 @@ uint32_t bit(uint32_t a, uint32_t b) {
 }
 
 //Default init hash values
-uint32_t IV1=0x67452501; 
-uint32_t IV2=0xefddac89;
-uint32_t IV3=0x98cafcfe; 
-uint32_t IV4=0x10425476;
+uint32_t IV1=0x67452301; 
+uint32_t IV2=0xefcdab89;
+uint32_t IV3=0x98badcfe; 
+uint32_t IV4=0x10325476;
 
 
 int block(void){
@@ -912,40 +912,6 @@ int block(void){
 	    // Q[50] = #... .... .... .... .... .... .... ....
 		Q [50] = II(Q [46], Q [49], Q [48], Q [47], m [ 7], 10, 0x432aff97);
 		Q1[50] = II(Q1[46], Q1[49], Q1[48], Q1[47], m1[ 7], 10, 0x432aff97);
-
-		if(DEBUG){
-	    	printf("Printing ∆Q[i] to check if it follows the differential path\n");
-	    	printf("PRINTING BSDR: ∆Q[i]: \n");
-	    	for(int i = 1; i < 65; i++){
-	    		printf("∆Q[%2d]:  ",i);
-	    		printf_bsdr(Q1[i],Q[i]);
-	    	}
-	    	printf("\n");
-	    }
-
-	    if(DEBUG){
-	    	printf("PRINTING Q[i], Q1[i]:\n");
-	    	for(int i = 1; i < 65; i++){
-	    		printf("Q [%2d]:  ",i);
-	    		print_bin(Q[i]);
-	    		printf("Q1[%2d]:  ",i);
-	    		print_bin(Q1[i]);
-	    		printf("\n");
-	    	}
-		}
-
-		if(DEBUG){
-			printf("Printing message differences\n");
-			for( int i = 0; i < 16; i++){
-				printf("δm[%2d]: ",i);
-				printf_bsdr( m1[i]-m[i], 0x00000000 );
-				printf("\n");
-			}
-		}
-
-		printf("Found it in 2^%2.2lf iterations\n", log(i)/log(2));
-	 
-	 	return 0;
 
 //		printf("2^%2.2lf iterations\n", log(i)/log(2));
 //		printf("Round 50\n");
