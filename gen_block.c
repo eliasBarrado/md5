@@ -353,8 +353,7 @@ int block(void){
 
 
 	    
-	    
-
+	   
 	    // For each Q[i]:
 	    // 		the first  'if' checks the bitconditions
 	    //		the second 'if' checks the differential path
@@ -913,9 +912,6 @@ int block(void){
 		Q [50] = II(Q [46], Q [49], Q [48], Q [47], m [ 7], 10, 0x432aff97);
 		Q1[50] = II(Q1[46], Q1[49], Q1[48], Q1[47], m1[ 7], 10, 0x432aff97);
 
-//		printf("2^%2.2lf iterations\n", log(i)/log(2));
-//		printf("Round 50\n");
-
 		if ( bit(Q[50],32) == bit(Q[48],32) )
 			continue;
 
@@ -1030,11 +1026,11 @@ int block(void){
 		printf("2^%2.2lf iterations\n", log(i)/log(2));
 		printf("Round 60\n");
 
-		if ( ( bit(Q[60],32) == bit(Q[58],32) ) || bit(Q[60],26) )
-			continue;
+//		if ( ( bit(Q[60],32) == bit(Q[58],32) ) || bit(Q[60],26) )
+//			continue;
 
-		if ( (Q1[60] - Q[60]) != 0x80000000 ) 
-	    	continue;
+//		if ( (Q1[60] - Q[60]) != 0x80000000 ) 
+//	    	continue;
 
 	    // Q[61] = m... ..1. .... .... .... .... .... ....
 		Q [61] = II(Q [57], Q [60], Q [59], Q [58], m [ 4],  6, 0xf7537e82);
@@ -1042,27 +1038,27 @@ int block(void){
 
 		printf("Round 61\n");
 
-		if ( bit(Q[61],32) != bit(Q[59],32) || !bit(Q[61],26) ) 
-	    	continue;
+//		if ( bit(Q[61],32) != bit(Q[59],32) || !bit(Q[61],26) ) 
+//	    	continue;
 
-		if ( (Q1[61] - Q[61]) != 0x80000000 ) 
-	    	continue;
+//		if ( (Q1[61] - Q[61]) != 0x80000000 ) 
+//	    	continue;
 
 		Q [62] = II(Q [58], Q [61], Q [60], Q [59], m [11], 10, 0xbd3af235);
 		Q1[62] = II(Q1[58], Q1[61], Q1[60], Q1[59], m1[11], 10, 0xbd3af235);
 
 		printf("Round 62\n");
 
-		if( bit(Q[62],32) != bit(Q[60],32) || bit(Q[62],26) )
-			continue;
+//		if( bit(Q[62],32) != bit(Q[60],32) || bit(Q[62],26) )
+//			continue;
 
 		Q [63] = II(Q [59], Q [62], Q [61], Q [60], m [ 2], 15, 0x2ad7d2bb);
 		Q1[63] = II(Q1[59], Q1[62], Q1[61], Q1[60], m1[ 2], 15, 0x2ad7d2bb);
 
 		printf("Round 63\n");
 
-		if( bit(Q[63],32) != bit(Q[61],32) || bit(Q[63],26) )
-			continue;
+//		if( bit(Q[63],32) != bit(Q[61],32) || bit(Q[63],26) )
+//			continue;
 
 		Q [64] = II(Q [60], Q [63], Q [62], Q [61], m [ 9], 21, 0xeb86d391);
 		Q1[64] = II(Q1[60], Q1[63], Q1[62], Q1[61], m1[ 9], 21, 0xeb86d391);
@@ -1075,9 +1071,13 @@ int block(void){
 	    if(DEBUG){
 	    	printf("Printing ∆Q[i] to check if it follows the differential path\n");
 	    	printf("PRINTING BSDR: ∆Q[i]: \n");
-	    	for(int i = 1; i < 65; i++){
+	    	for(int i = 1; i < 35; i++){
 	    		printf("∆Q[%2d]:  ",i);
 	    		printf_bsdr(Q1[i],Q[i]);
+	    	}
+	    	for(int i = 35; i < 65; i++){
+	    		printf("δQ[%2d]:  ",i);
+	    		printf_bsdr(Q1[i]-Q[i], 0x00000000);
 	    	}
 	    	printf("\n");
 	    }
@@ -1104,8 +1104,6 @@ int block(void){
 		}
 		
 		
-
-	    printf("Found it in %ld iterations\n", i);
 	    printf("Found it in 2^%2.2lf iterations\n", log(i)/log(2));
 	    return 0;
 
