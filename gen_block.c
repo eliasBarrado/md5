@@ -179,16 +179,16 @@ int block(void){
 
   	uint64_t i = 1;
   	uint64_t j = 0;
-  	int round30 = 0;
+  	int round50 = 0;
   	int cont = 0;
 
 	while(1){
 
-/*		if(i%500000000 == 0){
-			printf("%d\n", round30);
-			printf("%8.8lf\n", (double)(round30)/i*100);
+		if(i%500000000 == 0){
+			printf("%d\n", round50);
+			printf("%8.8lf\n", (double)(round50)/i*100);
 			return 0;
-		}*/
+		}
 		i++;
 
 
@@ -990,6 +990,8 @@ int block(void){
 	    // Q[50] = #... .... .... .... .... .... .... ....
 		Q [50] = II(Q [46], Q [49], Q [48], Q [47], m [ 7], 10, 0x432aff97);
 		Q1[50] = II(Q1[46], Q1[49], Q1[48], Q1[47], m1[ 7], 10, 0x432aff97);
+
+		round50++;
 
 		if ( bit(Q[50],32) == bit(Q[48],32) )
 			continue;
