@@ -307,9 +307,9 @@ int block(void){
 	    if( (m1[ 9] - m[ 9]) != 0x00000000)
 	    	continue;
 
-	    //  Q[11] = 00.. .... .... 0001 1100 ...0 11.. ..10 
+	    //  Q[11] = 0010 0000 1... 0001 1100 0000 1100 0010 
 	    // ∆Q[11] = ++00 0000 0000 0000 0000 0000 0000 0000
-	    Q [11] = (frandom() & 0x3ff00e3c) | 0x0001c0c2;
+	    Q [11] = (frandom() & 0x00700000) | 0x2081c0c2;
 	    Q1[11] = Q[11] ^ 0xc0000000;
 
 	    m [10] = RR(Q [11] - Q [10], 17) - F(Q [10], Q [ 9], Q [ 8]) - Q [ 7] - 0xffff5bb1;
@@ -1134,7 +1134,30 @@ int block(void){
 		Q1[64] = II(Q1[60], Q1[63], Q1[62], Q1[61], m1[ 9], 21, 0xeb86d391);
 
 		
+		//Last sufficient conditions  
+       if (bit(Q[64],6)) 
+    	continue;
 
+       if (bit(Q[64],26)) 
+        continue;
+
+       if (bit(Q[64],27)) 
+        continue;
+
+       if (!bit(Q[63],26))
+        continue;
+
+       if (bit(Q[63],27)) 
+        continue;  
+
+       if (bit(Q[62],26)) 
+        continue;
+
+       if (bit(Q[64],32) != bit(Q[63],32)) 
+        continue;
+
+       if (bit(Q[63],32) != bit(Q[62],32)) 
+        continue;
 
 	    
 
@@ -1197,32 +1220,6 @@ int block(void){
 
 	    write_block("m1_file", (void *)m);
 	    write_block("m2_file", (void *)m1);
-
-	    //Last sufficient conditions  
-       if (bit(Q[64],6)) 
-    	continue;
-
-       if (bit(Q[64],26)) 
-        continue;
-
-       if (bit(Q[64],27)) 
-        continue;
-
-       if (!bit(Q[63],26))
-        continue;
-
-       if (bit(Q[63],27)) 
-        continue;  
-
-       if (bit(Q[62],26)) 
-        continue;
-
-       if (bit(Q[64],32) != bit(Q[63],32)) 
-        continue;
-
-       if (bit(Q[63],32) != bit(Q[62],32)) 
-        continue;
-
 
 	    return 0;
 
