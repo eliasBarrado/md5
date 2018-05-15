@@ -362,9 +362,21 @@ int block(void){
 	    if( (m1[14] - m[14]) != 0x80000000)
 	    	continue;
 
-	    //  Q[16] = 0.1. .... .... .... .... .... .... .... 
+	    //  Q[16] = 0!1. .... .... ..!. .... .... .... .... 
 	    // ∆Q[16] = +0-0 0000 0000 0000 0000 0000 0000 0000
-	    Q [16] = (frandom() & 0x5fffffff) | 0x20000000;
+	    if( bit(Q[15], 31) ){
+	    	if( bit(Q[15],18) ){
+	    		Q [16] = ((frandom() & 0x1fffffff) | 0x20000000);
+	    	}else{
+	    		Q [16] = ((frandom() & 0x1fffffff) | 0x20020000);
+	    	}
+	    }else{
+	    	if( bit(Q[15],18) ){
+	    		Q [16] = ((frandom() & 0x1fffffff) | 0x60000000);
+	    	}else{
+	    		Q [16] = ((frandom() & 0x1fffffff) | 0x60020000);
+	    	}
+	    } 
 	    Q1[16] = Q[16] ^ 0xa0000000;
 
 	    m [15] = RR(Q [16] - Q [15], 22) - F(Q [15], Q [14], Q [13]) - Q [12] - 0x49b40821; 
@@ -1093,9 +1105,6 @@ int block(void){
 		Q [60] = II(Q [56], Q [59], Q [58], Q [57], m [13],  21, 0x4e0811a1);
 		Q1[60] = II(Q1[56], Q1[59], Q1[58], Q1[57], m1[13],  21, 0x4e0811a1);
 
-		printf("2^%2.2lf iterations\n", log(i)/log(2));
-		printf("Round 60\n");
-
 		if ( ( bit(Q[60],32) == bit(Q[58],32) ) || bit(Q[60],26) )
 			continue;
 
@@ -1106,8 +1115,6 @@ int block(void){
 		Q [61] = II(Q [57], Q [60], Q [59], Q [58], m [ 4],  6, 0xf7537e82);
 		Q1[61] = II(Q1[57], Q1[60], Q1[59], Q1[58], m1[ 4],  6, 0xf7537e82);
 
-		printf("Round 61\n");
-
 		if ( bit(Q[61],32) != bit(Q[59],32) || !bit(Q[61],26) ) 
 	    	continue;
 
@@ -1117,14 +1124,13 @@ int block(void){
 		Q [62] = II(Q [58], Q [61], Q [60], Q [59], m [11], 10, 0xbd3af235);
 		Q1[62] = II(Q1[58], Q1[61], Q1[60], Q1[59], m1[11], 10, 0xbd3af235);
 
-		printf("Round 62\n");
-
 		if( bit(Q[62],32) != bit(Q[60],32) || bit(Q[62],26) )
 			continue;
 
 		Q [63] = II(Q [59], Q [62], Q [61], Q [60], m [ 2], 15, 0x2ad7d2bb);
 		Q1[63] = II(Q1[59], Q1[62], Q1[61], Q1[60], m1[ 2], 15, 0x2ad7d2bb);
 
+		printf("2^%2.2lf iterations\n", log(i)/log(2));
 		printf("Round 63\n");
 
 		if( bit(Q[63],32) != bit(Q[61],32) || bit(Q[63],26) )
