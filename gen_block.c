@@ -187,8 +187,9 @@ int block(void){
 
 
 		if(i%50000000 == 0){
-		printf("%d\n", round50);
-			printf("%8.8lf\n", (double)(round50)/i*100);
+		printf("%d\n", cont++);
+		printf("%d\n", j++);
+			printf("%8.8lf\n", (double)(j)/cont*100);
 			return 0;
 		}
 		i++;
@@ -389,7 +390,7 @@ int block(void){
 
 
 	    
-	   
+	    cont++;
 	    // For each Q[i]:
 	    // 		the first  'if' checks the bitconditions
 	    //		the second 'if' checks the differential path
@@ -694,6 +695,8 @@ int block(void){
 
 	    if ( (Q[20] ^ Q1[20]) != 0x80000000 ) 
 	    	continue;
+
+	    j++;
 
 	    // Q[21] = 0... .... .... ..^. .... .... .... ....
 	    Q [21] = GG(Q [17], Q [20], Q [19], Q [18], m [ 5],  5, 0xd62f105d);
@@ -1142,12 +1145,7 @@ int block(void){
 		Q1[64] = II(Q1[60], Q1[63], Q1[62], Q1[61], m1[ 9], 21, 0xeb86d391);
 
 		printf("Round 64\n");
-<<<<<<< HEAD
-		
-		
-=======
 
->>>>>>> 7e9a2f76b8bbfc9eb425f281179facaff34f1092
 		//Last sufficient conditions  
         if (bit(Q[64],6)){
         	printf("bit(Q[64],6)\n");
