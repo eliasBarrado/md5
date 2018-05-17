@@ -184,11 +184,11 @@ int block(void){
 
 	while(1){
 
-		if(i%500000000 == 0){
+/*		if(i%500000000 == 0){
 			printf("%d\n", round50);
 			printf("%8.8lf\n", (double)(round50)/i*100);
 			return 0;
-		}
+		}*/
 		i++;
 
 
@@ -1141,7 +1141,6 @@ int block(void){
 
 		printf("Round 64\n");
 
-		
 		//Last sufficient conditions  
        if (bit(Q[64],6)) 
     	continue;
