@@ -15,6 +15,7 @@
 #define I(x, y, z) ((y) ^ ((x) | (~z)))
 
 #define DEBUG 1
+#define MESSAGEMOD 1
 
 // Round functions F,G,H,I of the md5 compression function
 uint32_t FF(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint32_t s, uint32_t ac){
@@ -180,18 +181,18 @@ int block(void){
   	uint64_t i = 1;
   	uint64_t j = 0;
   	int round50 = 0;
-  	int cont = 0;
+  	int round17 = 0;
 
 	while(1){
 
 
 
-/*		if(i%50000000 == 0){
-		printf("%d\n", cont++);
-		printf("%d\n", j++);
-			printf("%8.8lf\n", (double)(j)/cont*100);
+		if(i%10000000 == 0){
+		printf("Reach round17: %d\n", round17);
+		printf("Reach round50: %d\n", round50);
+		printf("%8.8lf\n", (double)(j)/round17*100);
 			return 0;
-		}*/
+		}
 		i++;
 
 
@@ -390,12 +391,16 @@ int block(void){
 
 
 	    
-	    cont++;
+	    round17++;
 	    // For each Q[i]:
 	    // 		the first  'if' checks the bitconditions
 	    //		the second 'if' checks the differential path
 
 
+
+
+
+	if(!MESSAGEMOD){
 
 		// Q[17] = 0!.. .... .... ..0. ^... .... .... ^...
 		if( bit(Q[16],31)){ 
@@ -473,25 +478,12 @@ int block(void){
 	    if( m1[ 5] != m[ 5] )
 	    	continue;    
 
+	}
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	    /*
+	if(MESSAGEMOD){	    
 
 	    // Q[17] = 0... .... .... ..0. ^... .... .... ^... 
 	    Q [17] = GG(Q [13], Q [16], Q [15], Q [14], m [ 1],  5, 0xf61e2562);
@@ -785,13 +777,15 @@ int block(void){
 	    	Q [20] = GG(Q [16], Q [19], Q [18], Q [17], m [ 0], 20, 0xe9b6c7aa);
 	    	Q1[20] = GG(Q1[16], Q1[19], Q1[18], Q1[17], m1[ 0], 20, 0xe9b6c7aa);
 	    	
-	    }*/
+	    }
    
 	    if ( bit(Q[20],32) )
 	    	continue;
 
 	    if ( (Q[20] ^ Q1[20]) != 0x80000000 ) 
 	    	continue;
+
+	}
 
 	    j++;
 
@@ -1202,7 +1196,7 @@ int block(void){
 
 		if ( (Q1[59] - Q[59]) != 0x80000000 ) 
 	    	continue;
-
+	    
 	    // Q[60] = #... .... .... .... .... .... .... ....
 		Q [60] = II(Q [56], Q [59], Q [58], Q [57], m [13],  21, 0x4e0811a1);
 		Q1[60] = II(Q1[56], Q1[59], Q1[58], Q1[57], m1[13],  21, 0x4e0811a1);
