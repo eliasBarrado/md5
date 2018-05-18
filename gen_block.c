@@ -15,7 +15,7 @@
 #define I(x, y, z) ((y) ^ ((x) | (~z)))
 
 #define DEBUG 1
-#define MESSAGEMOD 1
+#define MESSAGEMOD 0
 
 // Round functions F,G,H,I of the md5 compression function
 uint32_t FF(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint32_t s, uint32_t ac){
@@ -187,10 +187,12 @@ int block(void){
 
 
 
-		if(i%10000000 == 0){
+		if(i%100000000 == 0){
+		printf("\n");
 		printf("Reach round17: %d\n", round17);
 		printf("Reach round50: %d\n", round50);
 		printf("%8.8lf\n", (double)(j)/round17*100);
+		printf("Reach round 50 percent: %8.8lf\n\n", (double)(round50)/round17*100);
 			return 0;
 		}
 		i++;
@@ -402,6 +404,8 @@ int block(void){
 
 	if(!MESSAGEMOD){
 
+		for(int k = 0; k < 128; k++){
+
 		// Q[17] = 0!.. .... .... ..0. ^... .... .... ^...
 		if( bit(Q[16],31)){ 
 	    	Q [17] = (frandom() & 0x3ffd7ff7) | ( Q[16] & 0x00008008);
@@ -476,7 +480,10 @@ int block(void){
 	    m1[5] = RR(Q1[ 6] - Q1[ 5], 12) - F(Q1[ 5], Q1[ 4], Q1[ 3]) - Q1[ 2] - 0x4787c62a;
 
 	    if( m1[ 5] != m[ 5] )
-	    	continue;    
+	    	continue;  
+
+	    break;
+	    }  
 
 	}
 
