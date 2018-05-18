@@ -1106,21 +1106,21 @@ int block(void){
 		if ( (Q1[59] - Q[59]) != 0x80000000 ) 
 	    	continue;
 
-	    // Q[60] = #... ..0. .... .... .... .... .... ....
+	    // Q[60] = #... .... .... .... .... .... .... ....
 		Q [60] = II(Q [56], Q [59], Q [58], Q [57], m [13],  21, 0x4e0811a1);
 		Q1[60] = II(Q1[56], Q1[59], Q1[58], Q1[57], m1[13],  21, 0x4e0811a1);
 
-		if ( ( bit(Q[60],32) == bit(Q[58],32) ) || bit(Q[60],26) )
+		if ( bit(Q[60],32) == bit(Q[58],32) )
 			continue;
 
 		if ( (Q1[60] - Q[60]) != 0x80000000 ) 
 	    	continue;
 
-	    // Q[61] = m... ..1. .... .... .... .... .... ....
+	    // Q[61] = m... .... .... .... .... .... .... ....
 		Q [61] = II(Q [57], Q [60], Q [59], Q [58], m [ 4],  6, 0xf7537e82);
 		Q1[61] = II(Q1[57], Q1[60], Q1[59], Q1[58], m1[ 4],  6, 0xf7537e82);
 
-		if ( bit(Q[61],32) != bit(Q[59],32) || !bit(Q[61],26) ) 
+		if ( bit(Q[61],32) != bit(Q[59],32) ) 
 	    	continue;
 
 		if ( (Q1[61] - Q[61]) != 0x80000000 ) 
@@ -1135,18 +1135,13 @@ int block(void){
 
 		// Q[63] = m... .... .... .... .... .... .... ....
 		Q [63] = II(Q [59], Q [62], Q [61], Q [60], m [ 2], 15, 0x2ad7d2bb);
-		Q1[63] = II(Q1[59], Q1[62], Q1[61], Q1[60], m1[ 2], 15, 0x2ad7d2bb);
-
-		printf("2^%2.2lf iterations\n", log(i)/log(2));
-		printf("Round 63\n");
+		Q1[63] = II(Q1[59], Q1[62], Q1[61], Q1[60], m1[ 2], 15, 0x2ad7d2bb);		
 
 		if( bit(Q[63],32) != bit(Q[61],32) )
 			continue;
 
 		Q [64] = II(Q [60], Q [63], Q [62], Q [61], m [ 9], 21, 0xeb86d391);
 		Q1[64] = II(Q1[60], Q1[63], Q1[62], Q1[61], m1[ 9], 21, 0xeb86d391);
-
-		printf("Round 64\n");
 
   		
 		QM3 = QM3 + Q[61];
@@ -1157,19 +1152,18 @@ int block(void){
 
 		//Last sufficient conditions  
         if (bit(QM0,6)){
-        	printf("bit(QM0,6)\n");
 			continue;
         }
 
         if (bit(QM0,26)) {
-        	printf("bit(QM0,26)\n");
         	continue;
         }
 
         if (bit(QM0,27)) {
-        	printf("bit(QM0,27)\n");
         	continue;
         }
+
+        printf("2^%2.2lf iterations\n", log(i)/log(2));
 
         if (!bit(QM1,26)){
         	printf("bit(QM1,26)\n");
