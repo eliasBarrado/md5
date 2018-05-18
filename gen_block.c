@@ -1146,45 +1146,61 @@ int block(void){
 
 		printf("Round 64\n");
 
+		//Initialization 
+  		QM3 = IV1;  QM0 = IV2;
+  		QM1 = IV3;  QM2 = IV4;
+
+  		//Default init hash values
+		uint32_t IV1=0x67452301; 
+		uint32_t IV2=0xefcdab89;
+		uint32_t IV3=0x98badcfe; 
+		uint32_t IV4=0x10325476;
+
+		QM3 = QM3 + Q[61];
+		QM2 = QM2 + Q[62];
+		QM1 = QM1 + Q[63];
+		QM0 = QM0 + Q[64];
+
+
 		//Last sufficient conditions  
-        if (bit(Q[64],6)){
-        	printf("bit(Q[64],6)\n");
+        if (bit(QM0,6)){
+        	printf("bit(QM0,6)\n");
 			continue;
         }
 
-        if (bit(Q[64],26)) {
-        	printf("bit(Q[64],26)\n");
+        if (bit(QM0,26)) {
+        	printf("bit(QM0,26)\n");
         	continue;
         }
 
-        if (bit(Q[64],27)) {
-        	printf("bit(Q[64],27)\n");
+        if (bit(QM0,27)) {
+        	printf("bit(QM0,27)\n");
         	continue;
         }
 
-        if (!bit(Q[63],26)){
-        	printf("bit(Q[63],26)\n");
+        if (!bit(QM1,26)){
+        	printf("bit(QM1,26)\n");
         	continue;
         }
 
-        if (bit(Q[63],27)) {
-        	printf("bit(Q[63],27)\n");
+        if (bit(QM1,27)) {
+        	printf("bit(QM1,27)\n");
         	continue;  
         }
 
-        if (bit(Q[62],26)) {
-        	printf("bit(Q[62],26)\n");
+        if (bit(QM2,26)) {
+        	printf("bit(QM2,26)\n");
         	continue;
         }
 
-       	if (bit(Q[64],32) != bit(Q[63],32)) {
-       		printf("bit(Q[64],32) != bit(Q[63],32)\n");
+       	if (bit(QM0,32) != bit(QM1,32)) {
+       		printf("bit(QM0,32) != bit(QM1,32)\n");
        		continue;
        	} 
         	
 
-        if (bit(Q[63],32) != bit(Q[62],32)) {
-        	printf("bit(Q[63],32) != bit(Q[62],32)\n");
+        if (bit(QM1,32) != bit(QM0,32)) {
+        	printf("bit(QM1,32) != bit(QM0,32)\n");
         	continue;
         }
 
