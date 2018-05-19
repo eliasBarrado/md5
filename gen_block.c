@@ -187,14 +187,14 @@ int block(void){
 
 
 
-		if(i%100000000 == 0){
+/*		if(i%100000000 == 0){
 		printf("\n");
 		printf("Reach round17: %d\n", round17);
 		printf("Reach round50: %d\n", round50);
 		printf("%8.8lf\n", (double)(j)/round17*100);
 		printf("Reach round 50 percent: %8.8lf\n\n", (double)(round50)/round17*100);
 			return 0;
-		}
+		}*/
 		i++;
 
 
@@ -405,6 +405,8 @@ int block(void){
 	if(!MESSAGEMOD){
 
 		for(int k = 0; k < 128; k++){
+
+		i++;
 
 		// Q[17] = 0!.. .... .... ..0. ^... .... .... ^...
 		if( bit(Q[16],31)){ 
@@ -1241,7 +1243,6 @@ int block(void){
 		Q [64] = II(Q [60], Q [63], Q [62], Q [61], m [ 9], 21, 0xeb86d391);
 		Q1[64] = II(Q1[60], Q1[63], Q1[62], Q1[61], m1[ 9], 21, 0xeb86d391);
 
-  		
 		QM3 = QM3 + Q[61];
 		QM2 = QM2 + Q[62];
 		QM1 = QM1 + Q[63];
@@ -1288,6 +1289,11 @@ int block(void){
         	printf("bit(QM1,32) != bit(QM0,32)\n");
         	continue;
         }
+
+        IV1 = QM3;
+		IV2 = QM0;
+		IV3 = QM1;
+		IV4 = QM2;
 
 	    
 
