@@ -16,6 +16,8 @@
 
 #define DEBUG 1
 
+
+
 // Round functions F,G,H,I of the md5 compression function
 uint32_t FF(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint32_t s, uint32_t ac){
  	a = F(b,c,d) + a + x + ac;
@@ -37,6 +39,7 @@ uint32_t HH(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint32_t
  	a = a + b;
  	return a;
  }
+
 uint32_t II(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint32_t s, uint32_t ac){
  	a = I(b,c,d) + a + x + ac;
  	a = RL(a,s);
@@ -548,7 +551,7 @@ int block(void){
 	    Q [22] = GG(Q [18], Q [21], Q [20], Q [19], m [10],  9, 0x2441453);
 	    Q1[22] = GG(Q1[18], Q1[21], Q1[20], Q1[19], m1[10],  9, 0x2441453); 
 
-	    if( bit(Q[22],32) ){
+/*	    if( bit(Q[22],32) ){
 	    	
 	    	m [8] = m[8] + 0x00004000;
 	    	m1[8] = m[8];
@@ -565,7 +568,7 @@ int block(void){
 	    	Q [22] = GG(Q [18], Q [21], Q [20], Q [19], m [10],  9, 0x2441453);
 	    	Q1[22] = GG(Q1[18], Q1[21], Q1[20], Q1[19], m1[10],  9, 0x2441453); 
 
-	    }
+	    } */
 
 	    if ( bit(Q[22],32) )
 	    	continue;
@@ -577,7 +580,7 @@ int block(void){
 	    Q [23] = GG(Q [19], Q [22], Q [21], Q [20], m [15], 14, 0xd8a1e681);
 	    Q1[23] = GG(Q1[19], Q1[22], Q1[21], Q1[20], m1[15], 14, 0xd8a1e681);
 
-	    if ( bit(Q[23],32) ) {
+/*	    if ( bit(Q[23],32) ) {
 
 	    		m [10] = m[10] + 0x00000800;
 	    		m1[10] = m[10];
@@ -603,7 +606,7 @@ int block(void){
 	    		Q [23] = GG(Q [19], Q [22], Q [21], Q [20], m [15], 14, 0xd8a1e681);
 	    		Q1[23] = GG(Q1[19], Q1[22], Q1[21], Q1[20], m1[15], 14, 0xd8a1e681);
 
-		}
+		} */
 
 	    if ( bit(Q[23],32) )
 	    	continue;
@@ -897,48 +900,76 @@ int block(void){
 		Q [61] = II(Q [57], Q [60], Q [59], Q [58], m [ 4],  6, 0xf7537e82);
 		Q1[61] = II(Q1[57], Q1[60], Q1[59], Q1[58], m1[ 4],  6, 0xf7537e82);
 
-		if ( bit(Q[61],32) != bit(Q[59],32) ) 
-	    	continue;
+		QM3   = QM3 + Q [61];
+		QM3_1 = QM3 + Q1[61];
 
-		if ( (Q1[61] - Q[61]) != 0x80000000 ) 
-	    	continue;
+		printf_bsdr(QM3_1, QM3);
+
+		if( QM3 ^ QM3_1 != 0x80000000)
+			continue;
+
+		return 0;
+
+//		if ( bit(Q[61],32) != bit(Q[59],32) ) 
+//	    	continue;
+
+//		if ( (Q1[61] - Q[61]) != 0x80000000 ) 
+//	    	continue;
 
 	    // Q[62] = m... .... .... .... .... .... .... ....
 		Q [62] = II(Q [58], Q [61], Q [60], Q [59], m [11], 10, 0xbd3af235);
 		Q1[62] = II(Q1[58], Q1[61], Q1[60], Q1[59], m1[11], 10, 0xbd3af235);
 
-		if( bit(Q[62],32) != bit(Q[60],32) )
-			continue;
+//		if( bit(Q[62],32) != bit(Q[60],32) )
+//			continue;
 
-		if( Q1[62] - Q[62] != 0x82000000 )
-			continue;
+//		if( Q1[62] - Q[62] != 0x82000000 )
+//			continue;
 
 		// Q[63] = m... .... .... .... .... .... .... ....
 		Q [63] = II(Q [59], Q [62], Q [61], Q [60], m [ 2], 15, 0x2ad7d2bb);
 		Q1[63] = II(Q1[59], Q1[62], Q1[61], Q1[60], m1[ 2], 15, 0x2ad7d2bb);		
 
-		if( bit(Q[63],32) != bit(Q[61],32) )
-			continue;
+//		if( bit(Q[63],32) != bit(Q[61],32) )
+//			continue;
 
-		if( Q1[63] - Q[63] != 0x82000000 )
-			continue;
+//		if( Q1[63] - Q[63] != 0x82000000 )
+//			continue;
 
 		Q [64] = II(Q [60], Q [63], Q [62], Q [61], m [ 9], 21, 0xeb86d391);
 		Q1[64] = II(Q1[60], Q1[63], Q1[62], Q1[61], m1[ 9], 21, 0xeb86d391);
 
-		if( Q1[64] - Q[64] != 0x82000000 )
-			continue;
+//		if( Q1[64] - Q[64] != 0x82000000 )
+//			continue;
 
-		QM3 = QM3 + Q[61];
-		QM2 = QM2 + Q[62];
-		QM1 = QM1 + Q[63];
-		QM0 = QM0 + Q[64];
+		
+		QM2   = QM2 + Q[62];
+		QM1   = QM1 + Q[63];
+		QM0   = QM0 + Q[64];
 
-		QM3_1 = QM3 + Q1[61];
+		
 		QM2_1 = QM2 + Q1[62];
 		QM1_1 = QM1 + Q1[63];
 		QM0_1 = QM0 + Q1[64];
 
+		
+		printf_bsdr(QM2_1, QM2);
+		printf_bsdr(QM1_1, QM1);
+		printf_bsdr(QM0_1, QM0);
+		
+
+		if( QM0 ^ QM0_1 != 0x82000000)
+			continue;
+
+		printf("2^%2.2lf iterations\n", log(i)/log(2));
+
+		if( QM1 ^ QM1_1 != 0x86000000)
+			continue;
+
+		if( QM2 ^ QM2_1 != 0x82000000)
+			continue;
+
+		
 
 		//Last sufficient conditions  
         if (bit(QM0,6)){
@@ -952,8 +983,6 @@ int block(void){
         if (bit(QM0,27)) {
         	continue;
         }
-
-        printf("2^%2.2lf iterations\n", log(i)/log(2));
 
         if (!bit(QM1,26)){
         	printf("bit(QM1,26)\n");
