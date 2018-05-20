@@ -137,19 +137,19 @@ void md5compress(uint32_t *h0, uint32_t *h1, uint32_t *h2, uint32_t *h3, uint32_
 
         // prints the intermediate 4 words in hexadecimal format
         uint8_t *p;
-        printf("%2.2i: ", i);
+//       printf("%2.2i: ", i);
         p=(uint8_t *)&a;
-        printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3]);
+//       printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3]);
      
         p=(uint8_t *)&b;
-        printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3]);
+//       printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3]);
      
         p=(uint8_t *)&c;
-        printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3]);
+//        printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3]);
      
         p=(uint8_t *)&d;
-        printf("%2.2x%2.2x%2.2x%2.2x", p[0], p[1], p[2], p[3]);
-        puts("");
+//      printf("%2.2x%2.2x%2.2x%2.2x", p[0], p[1], p[2], p[3]);
+//        puts("");
         
         uint32_t f, g;
 

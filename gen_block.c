@@ -196,13 +196,14 @@ int block(void){
 
 
 
-/*		if(i%10000000 == 0){
+		if(i%100000000 == 0){
 			printf("\n");
+			printf("%ld\n", i );
 			printf("Reach round17: %d\n", round17);
 			printf("Reach round50: %d\n", round50);
 			printf("Reach round 50 percent: %8.8lf\n\n", (double)(round50)/round17*100);
 			return 0;
-		}*/
+		}
 		i++;
 
 
@@ -551,7 +552,7 @@ int block(void){
 	    Q [22] = GG(Q [18], Q [21], Q [20], Q [19], m [10],  9, 0x2441453);
 	    Q1[22] = GG(Q1[18], Q1[21], Q1[20], Q1[19], m1[10],  9, 0x2441453); 
 
-/*	    if( bit(Q[22],32) ){
+	    if( bit(Q[22],32) ){
 	    	
 	    	m [8] = m[8] + 0x00004000;
 	    	m1[8] = m[8];
@@ -568,7 +569,7 @@ int block(void){
 	    	Q [22] = GG(Q [18], Q [21], Q [20], Q [19], m [10],  9, 0x2441453);
 	    	Q1[22] = GG(Q1[18], Q1[21], Q1[20], Q1[19], m1[10],  9, 0x2441453); 
 
-	    } */
+	    } 
 
 	    if ( bit(Q[22],32) )
 	    	continue;
@@ -580,7 +581,7 @@ int block(void){
 	    Q [23] = GG(Q [19], Q [22], Q [21], Q [20], m [15], 14, 0xd8a1e681);
 	    Q1[23] = GG(Q1[19], Q1[22], Q1[21], Q1[20], m1[15], 14, 0xd8a1e681);
 
-/*	    if ( bit(Q[23],32) ) {
+	    if ( bit(Q[23],32) ) {
 
 	    		m [10] = m[10] + 0x00000800;
 	    		m1[10] = m[10];
@@ -606,7 +607,7 @@ int block(void){
 	    		Q [23] = GG(Q [19], Q [22], Q [21], Q [20], m [15], 14, 0xd8a1e681);
 	    		Q1[23] = GG(Q1[19], Q1[22], Q1[21], Q1[20], m1[15], 14, 0xd8a1e681);
 
-		} */
+		} 
 
 	    if ( bit(Q[23],32) )
 	    	continue;
@@ -900,75 +901,71 @@ int block(void){
 		Q [61] = II(Q [57], Q [60], Q [59], Q [58], m [ 4],  6, 0xf7537e82);
 		Q1[61] = II(Q1[57], Q1[60], Q1[59], Q1[58], m1[ 4],  6, 0xf7537e82);
 
-		QM3   = QM3 + Q [61];
 		QM3_1 = QM3 + Q1[61];
+		QM3   = QM3 + Q [61];		
 
-		printf_bsdr(QM3_1, QM3);
+		if ( bit(Q[61],32) != bit(Q[59],32) ) 
+	    	continue;
 
-		if( QM3 ^ QM3_1 != 0x80000000)
+		if ( (Q1[61] - Q[61]) != 0x80000000 ) 
+	    	continue;
+
+	    if( (QM3 ^ QM3_1) != 0x80000000){
 			continue;
-
-		return 0;
-
-//		if ( bit(Q[61],32) != bit(Q[59],32) ) 
-//	    	continue;
-
-//		if ( (Q1[61] - Q[61]) != 0x80000000 ) 
-//	    	continue;
+	    }
 
 	    // Q[62] = m... .... .... .... .... .... .... ....
 		Q [62] = II(Q [58], Q [61], Q [60], Q [59], m [11], 10, 0xbd3af235);
 		Q1[62] = II(Q1[58], Q1[61], Q1[60], Q1[59], m1[11], 10, 0xbd3af235);
 
-//		if( bit(Q[62],32) != bit(Q[60],32) )
-//			continue;
+		QM2_1 = QM2 + Q1[62];
+		QM2   = QM2 + Q [62];
 
-//		if( Q1[62] - Q[62] != 0x82000000 )
-//			continue;
+		if( bit(Q[62],32) != bit(Q[60],32) )
+			continue;
+
+		if( Q1[62] - Q[62] != 0x82000000 )
+			continue;
+
+		if( (QM2 ^ QM2_1) != 0x82000000)
+			continue;
 
 		// Q[63] = m... .... .... .... .... .... .... ....
 		Q [63] = II(Q [59], Q [62], Q [61], Q [60], m [ 2], 15, 0x2ad7d2bb);
-		Q1[63] = II(Q1[59], Q1[62], Q1[61], Q1[60], m1[ 2], 15, 0x2ad7d2bb);		
+		Q1[63] = II(Q1[59], Q1[62], Q1[61], Q1[60], m1[ 2], 15, 0x2ad7d2bb);	
 
-//		if( bit(Q[63],32) != bit(Q[61],32) )
-//			continue;
+		QM1_1 = QM1 + Q1[63];
+		QM1   = QM1 + Q [63];
 
-//		if( Q1[63] - Q[63] != 0x82000000 )
-//			continue;
+		if( bit(Q[63],32) != bit(Q[61],32) )
+			continue;
+
+		if( Q1[63] - Q[63] != 0x82000000 )
+			continue;
+
+		if( (QM1 ^ QM1_1) != 0x86000000)
+			continue;
 
 		Q [64] = II(Q [60], Q [63], Q [62], Q [61], m [ 9], 21, 0xeb86d391);
 		Q1[64] = II(Q1[60], Q1[63], Q1[62], Q1[61], m1[ 9], 21, 0xeb86d391);
 
-//		if( Q1[64] - Q[64] != 0x82000000 )
-//			continue;
+		printf("Round 64\n");
 
-		
-		QM2   = QM2 + Q[62];
-		QM1   = QM1 + Q[63];
-		QM0   = QM0 + Q[64];
-
-		
-		QM2_1 = QM2 + Q1[62];
-		QM1_1 = QM1 + Q1[63];
 		QM0_1 = QM0 + Q1[64];
+		QM0   = QM0 + Q [64];
+
+		if( Q1[64] - Q[64] != 0x82000000 )
+			continue;
+				
+		if( (QM0 ^ QM0_1) != 0x82000000)
+			continue;
+		
 
 		
 		printf_bsdr(QM2_1, QM2);
 		printf_bsdr(QM1_1, QM1);
 		printf_bsdr(QM0_1, QM0);
 		
-
-		if( QM0 ^ QM0_1 != 0x82000000)
-			continue;
-
-		printf("2^%2.2lf iterations\n", log(i)/log(2));
-
-		if( QM1 ^ QM1_1 != 0x86000000)
-			continue;
-
-		if( QM2 ^ QM2_1 != 0x82000000)
-			continue;
-
 		
 
 		//Last sufficient conditions  
@@ -1021,7 +1018,7 @@ int block(void){
 		IV4_1 = QM2_1;
 
 	    
-
+/*
 	    if(DEBUG){
 	    	printf("Printing ∆Q[i] to check if it follows the differential path\n");
 	    	printf("PRINTING BSDR: ∆Q[i]: \n");
@@ -1034,7 +1031,7 @@ int block(void){
 	    		printf_bsdr(Q1[i]-Q[i], 0x00000000);
 	    	}
 	    	printf("\n");
-	    }
+	    }*/
 
 	    /*
 	    if(DEBUG){
@@ -1048,6 +1045,7 @@ int block(void){
 	    	}
 		}*/
 
+	    /*
 		if(DEBUG){
 			printf("Printing message differences\n");
 			for( int i = 0; i < 16; i++){
@@ -1055,7 +1053,7 @@ int block(void){
 				printf_bsdr( m1[i]-m[i], 0x00000000 );
 				printf("\n");
 			}
-		}
+		} */
 
 
 		
@@ -1103,12 +1101,6 @@ int block2(void){
   	//Initialization 
   	QM3_1 = IV1_1;  QM0_1 = IV2_1;
   	QM1_1 = IV3_1;  QM2_1 = IV4_1;
-
-
-  	printf_bsdr(QM3_1 , QM3);
-  	printf_bsdr(QM2_1 , QM2);
-  	printf_bsdr(QM1_1 , QM1);
-  	printf_bsdr(QM0_1 , QM0);
 
 	// Hex table
 	// 0 = 0000  1 = 0001  2 = 0010  3 = 0011
@@ -1166,7 +1158,7 @@ int block2(void){
 	    m1[ 0] = RR(Q1[ 1] - QM0_1  ,  7) - F(QM0_1  , QM1_1  , QM2_1  ) - QM3_1   - 0xd76aa478;
 
 	    if( m1[ 0] != m[ 0] )
-	    	continue;    
+	    	continue;  
 
 	    // Q[2]  = ^^^^ 110. ..0^ ^^^0 1..^ 1... ^10. .00. 
 	    Q [2]  = frandom() & 0x01c06759 | 0x0c008840 | Q[1] & 0xf01e1080;
@@ -1185,6 +1177,8 @@ int block2(void){
 	    m [ 2] = RR(Q [ 3] - Q [ 2], 17) - F(Q [ 2], Q [ 1], QM0    ) - QM1     - 0x242070db;
 	    m1[ 2] = RR(Q1[ 3] - Q1[ 2], 17) - F(Q1[ 2], Q1[ 1], QM0_1  ) - QM1_1   - 0x242070db;
 
+	     printf("Round 4\n");
+
 	    if( m1[ 2] != m[ 2] )
 	    	continue; 
 
@@ -1194,6 +1188,8 @@ int block2(void){
 
 	    m [ 3] = RR(Q [ 4] - Q [ 3], 22) - F(Q [ 3], Q [ 2], Q [ 1]) - QM0     - 0xc1bdceee;
 	    m1[ 3] = RR(Q1[ 4] - Q1[ 3], 22) - F(Q1[ 3], Q1[ 2], Q1[ 1]) - QM0_1   - 0xc1bdceee;
+
+	     printf("Round 5\n");
 
 	    if( m1[ 3] != m[ 3] )
 	    	continue; 
@@ -1208,20 +1204,6 @@ int block2(void){
 
 	    if( (m1[ 4] - m[ 4]) != 0x80000000)
 	    	continue;
-
-	     if(DEBUG){
-	    	printf("Printing ∆Q[i] to check if it follows the differential path\n");
-	    	printf("PRINTING BSDR: ∆Q[i]: \n");
-	    	for(int i = 1; i < 5; i++){
-	    		printf("∆Q[%2d]:  ",i);
-	    		printf_bsdr(Q1[i],Q[i]);
-	    	}
-	    	for(int i = 35; i < 35; i++){
-	    		printf("δQ[%2d]:  ",i);
-	    		printf_bsdr(Q1[i]-Q[i], 0x00000000);
-	    	}
-	    	printf("\n");
-	    }
 	
 	    return 0;
 
@@ -1349,6 +1331,8 @@ int block2(void){
 
 	    if( (m1[15] - m[15]) != 0x00000000)
 	    	continue;
+
+	    return 0;
 	
 
 	    // For each Q[i]:
@@ -1727,9 +1711,27 @@ int main (void){
 	seed32_1 = rand();
 	seed32_2 = rand() % 162287;
 
+	printf("Starting first block computation\n");
+	printf("IV1 = %x\n", IV1 );
+	printf("IV2 = %x\n", IV2 );
+	printf("IV3 = %x\n", IV3 );
+	printf("IV4 = %x\n", IV4 );
 	block();
+/*
+	printf("IV1 = %x\n", IV1 );
+	printf("IV2 = %x\n", IV2 );
+	printf("IV3 = %x\n", IV3 );
+	printf("IV4 = %x\n", IV4 );
 
-//	block2();
+	printf("IV1_1 = %x\n", IV1_1 );
+	printf("IV2_1 = %x\n", IV2_1 );
+	printf("IV3_1 = %x\n", IV3_1 );
+	printf("IV4_1 = %x\n", IV4_1 );
+
+
+
+	printf("Starting second block computation\n");
+	block2();*/
 	
 	time_t end = time(NULL);
 
