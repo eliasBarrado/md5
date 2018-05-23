@@ -188,9 +188,13 @@ int block(void){
 
   	uint64_t i = 1;
   	uint64_t j = 0;
-  	int round50 = 0;
+
   	int round17 = 0;
-  	int cont = 0;
+  	int round25 = 0;
+  	int round48 = 0;
+  	int round61 = 0;
+
+  	int cont    = 0;
 
 	while(1){
 
@@ -198,10 +202,15 @@ int block(void){
 
 		if(i%100000000 == 0){
 			printf("\n");
-			printf("%ld\n", i );
-			printf("Reach round17: %d\n", round17);
-			printf("Reach round50: %d\n", round50);
-			printf("Reach round 50 percent: %8.8lf\n\n", (double)(round50)/round17*100);
+			printf("Total iterations: %ld\n", i );
+			printf("Reached round 17: %d\n" , round17);
+			printf("Reached round 25: %d\n" , round25);
+			printf("Reach round48:    %d\n" , round48);
+			printf("Reach round61:    %d\n" , round61);
+			printf("Reach round17/total percent:   %8.8lf%%\n\n" , (double)(round17)/i*100);
+			printf("Reach round25/total percent:   %8.8lf%%\n\n" , (double)(round25)/i*100);
+			printf("Reach round48/total percent:   %8.8lf%%\n\n" , (double)(round48)/i*100);
+			printf("Reach round61/total percent:   %8.8lf%%\n\n" , (double)(round61)/i*100);
 			return 0;
 		}
 		i++;
@@ -370,9 +379,9 @@ int block(void){
 	    if( (m1[15] - m[15]) != 0x00000000)
 	    	continue;
 
-
 	    
 	    round17++;
+
 	    // For each Q[i]:
 	    // 		the first  'if' checks the bitconditions
 	    //		the second 'if' checks the differential path
@@ -625,6 +634,8 @@ int block(void){
 	    if ( (Q[24] ^ Q1[24]) != 0x00000000 ) 
 	    	continue;
 
+	    round25++;
+
 	    // No bitconditions for Q[25]...Q[47]
 	    Q [25] = GG(Q [21], Q [24], Q [23], Q [22], m [ 9],  5, 0x21e1cde6);
 	    Q1[25] = GG(Q1[21], Q1[24], Q1[23], Q1[22], m1[ 9],  5, 0x21e1cde6);
@@ -769,6 +780,8 @@ int block(void){
 	    Q [48] = HH(Q [44], Q [47], Q [46], Q [45], m [ 2], 23, 0xc4ac5665);
 	    Q1[48] = HH(Q1[44], Q1[47], Q1[46], Q1[45], m1[ 2], 23, 0xc4ac5665);
 
+	    round48++;
+
 	    if ( bit(Q[48],32) != bit(Q[46],32) )
 	    	continue;
 
@@ -788,8 +801,6 @@ int block(void){
 	    // Q[50] = #... .... .... .... .... .... .... ....
 		Q [50] = II(Q [46], Q [49], Q [48], Q [47], m [ 7], 10, 0x432aff97);
 		Q1[50] = II(Q1[46], Q1[49], Q1[48], Q1[47], m1[ 7], 10, 0x432aff97);
-
-		round50++;
 
 		if ( bit(Q[50],32) == bit(Q[48],32) )
 			continue;
@@ -897,6 +908,8 @@ int block(void){
 		if ( (Q1[60] - Q[60]) != 0x80000000 ) 
 	    	continue;
 
+	    round61++;
+
 	    // Q[61] = m... .... .... .... .... .... .... ....
 		Q [61] = II(Q [57], Q [60], Q [59], Q [58], m [ 4],  6, 0xf7537e82);
 		Q1[61] = II(Q1[57], Q1[60], Q1[59], Q1[58], m1[ 4],  6, 0xf7537e82);
@@ -948,8 +961,6 @@ int block(void){
 
 		Q [64] = II(Q [60], Q [63], Q [62], Q [61], m [ 9], 21, 0xeb86d391);
 		Q1[64] = II(Q1[60], Q1[63], Q1[62], Q1[61], m1[ 9], 21, 0xeb86d391);
-
-		printf("Round 64\n");
 
 		QM0_1 = QM0 + Q1[64];
 		QM0   = QM0 + Q [64];
