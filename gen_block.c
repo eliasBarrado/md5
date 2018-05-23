@@ -200,7 +200,7 @@ int block(void){
 
 
 
-		if(i%100000000 == 0){
+		if(i%1000000 == 0){
 			printf("\n");
 			printf("Total iterations: %ld\n", i );
 			printf("Reached round 17: %d\n" , round17);
@@ -923,9 +923,8 @@ int block(void){
 		if ( (Q1[61] - Q[61]) != 0x80000000 ) 
 	    	continue;
 
-	    if( (QM3 ^ QM3_1) != 0x80000000){
+	    if( (QM3 ^ QM3_1) != 0x80000000 )
 			continue;
-	    }
 
 	    // Q[62] = m... .... .... .... .... .... .... ....
 		Q [62] = II(Q [58], Q [61], Q [60], Q [59], m [11], 10, 0xbd3af235);
@@ -940,7 +939,10 @@ int block(void){
 		if( Q1[62] - Q[62] != 0x82000000 )
 			continue;
 
-		if( (QM2 ^ QM2_1) != 0x82000000)
+		if (bit(QM2,26) ) 
+        	continue;
+
+		if( (QM2 ^ QM2_1) != 0x82000000 )
 			continue;
 
 		// Q[63] = m... .... .... .... .... .... .... ....
@@ -956,7 +958,10 @@ int block(void){
 		if( Q1[63] - Q[63] != 0x82000000 )
 			continue;
 
-		if( (QM1 ^ QM1_1) != 0x86000000)
+		if (!bit(QM1,26) || bit(QM1,27) || bit(QM1,32) != bit(QM2,32) ) 
+        	continue;
+
+        if( (QM1 ^ QM1_1) != 0x86000000)
 			continue;
 
 		Q [64] = II(Q [60], Q [63], Q [62], Q [61], m [ 9], 21, 0xeb86d391);
@@ -970,53 +975,16 @@ int block(void){
 				
 		if( (QM0 ^ QM0_1) != 0x82000000)
 			continue;
-		
 
+		if( bit(QM0,6) || bit(QM0,26) || bit(QM0,27) || bit(QM0,32) != bit(QM1,32) ) 
+			continue;
+        
 		
+		printf_bsdr(QM3_1, QM3);
 		printf_bsdr(QM2_1, QM2);
 		printf_bsdr(QM1_1, QM1);
 		printf_bsdr(QM0_1, QM0);
 		
-		
-
-		//Last sufficient conditions  
-        if (bit(QM0,6)){
-			continue;
-        }
-
-        if (bit(QM0,26)) {
-        	continue;
-        }
-
-        if (bit(QM0,27)) {
-        	continue;
-        }
-
-        if (!bit(QM1,26)){
-        	printf("bit(QM1,26)\n");
-        	continue;
-        }
-
-        if (bit(QM1,27)) {
-        	printf("bit(QM1,27)\n");
-        	continue;  
-        }
-
-        if (bit(QM2,26)) {
-        	printf("bit(QM2,26)\n");
-        	continue;
-        }
-
-       	if (bit(QM0,32) != bit(QM1,32)) {
-       		printf("bit(QM0,32) != bit(QM1,32)\n");
-       		continue;
-       	} 
-        	
-
-        if (bit(QM1,32) != bit(QM0,32)) {
-        	printf("bit(QM1,32) != bit(QM0,32)\n");
-        	continue;
-        }
 
         IV1 = QM3;
 		IV2 = QM0;
@@ -1715,7 +1683,10 @@ int block2(void){
 
 int main (void){
 
-	time_t start = time(NULL);
+	double cpu_time_used;
+	clock_t start_t, end_t;
+
+	start_t = clock();
 	
 	// Initializing seed for random number generator
 	srand ( time(NULL) );
@@ -1728,6 +1699,11 @@ int main (void){
 	printf("IV3 = %x\n", IV3 );
 	printf("IV4 = %x\n", IV4 );
 	block();
+
+	end_t = clock();
+	cpu_time_used = ((double) (end_t - start_t)) / CLOCKS_PER_SEC;
+	printf("Block 1 found in %lf seconds\n", cpu_time_used  );
+
 /*
 	printf("IV1 = %x\n", IV1 );
 	printf("IV2 = %x\n", IV2 );
@@ -1740,14 +1716,9 @@ int main (void){
 	printf("IV4_1 = %x\n", IV4_1 );
 
 
-
 	printf("Starting second block computation\n");
 	block2();*/
 	
-	time_t end = time(NULL);
-
-	printf("%u seconds to execute \n", (uint32_t)(end-start));
-
 	return 0;
 }
 
