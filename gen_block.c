@@ -16,6 +16,13 @@
 
 #define DEBUG 1
 
+/*
+#define FF(a, b, c, d, x, s, ac) RL( F( (b), (c), (d) ) + (a) + (x) + (uint32_t)(ac), (s) ) + (b)
+#define GG(a, b, c, d, x, s, ac) RL( G( (b), (c), (d) ) + (a) + (x) + (uint32_t)(ac), (s) ) + (b)
+#define HH(a, b, c, d, x, s, ac) RL( H( (b), (c), (d) ) + (a) + (x) + (uint32_t)(ac), (s) ) + (b)
+#define II(a, b, c, d, x, s, ac) RL( I( (b), (c), (d) ) + (a) + (x) + (uint32_t)(ac), (s) ) + (b)
+
+*/
 
 
 // Round functions F,G,H,I of the md5 compression function
@@ -130,10 +137,14 @@ uint32_t frandom() {
 //	For example if a = 0x4000001 
 //		bit(a, 1) returns 1
 //		bit(a,31) returns 1
-//Provide a valid b ==> 0 < b < 33			
+//Provide a valid b ==> 0 < b < 33
+
+			
 uint32_t bit(uint32_t a, uint32_t b) {
       return (a & mask_bit[b]) >> (b-1);
 }
+
+//#define bit(a, b) ((a) & mask_bit[b] >> ((b) - 1))
 
 
 // Write block to disk - Returns 0 if ok, 1 if cannot open, 2 if write error
@@ -936,8 +947,8 @@ int block(void){
 		if( bit(Q[62],32) != bit(Q[60],32) )
 			continue;
 
-		if( Q1[62] - Q[62] != 0x82000000 )
-			continue;
+//		if( Q1[62] - Q[62] != 0x82000000 )
+//			continue;
 
 		if (bit(QM2,26) ) 
         	continue;
@@ -955,8 +966,8 @@ int block(void){
 		if( bit(Q[63],32) != bit(Q[61],32) )
 			continue;
 
-		if( Q1[63] - Q[63] != 0x82000000 )
-			continue;
+//		if( Q1[63] - Q[63] != 0x82000000 )
+//			continue;
 
 		if (!bit(QM1,26) || bit(QM1,27) || bit(QM1,32) != bit(QM2,32) ) 
         	continue;
@@ -970,8 +981,10 @@ int block(void){
 		QM0_1 = QM0 + Q1[64];
 		QM0   = QM0 + Q [64];
 
-		if( Q1[64] - Q[64] != 0x82000000 )
-			continue;
+		printf("2^%2.2lf iterations\n\n", log(i)/log(2));
+
+//		if( Q1[64] - Q[64] != 0x82000000 )
+//			continue;
 				
 		if( (QM0 ^ QM0_1) != 0x82000000)
 			continue;
@@ -1074,12 +1087,29 @@ int block2(void){
 
 
 	//Initialization 
-  	QM3 = IV1;  QM0 = IV2;
-  	QM1 = IV3;  QM2 = IV4;
+  	QM3 = IV1;
+  	QM2 = IV4;
+  	QM1 = IV3;
+  	QM0 = IV2;
+ 
+  	QM3_1 = IV1_1;
+  	QM2_1 = IV4_1;
+  	QM1_1 = IV3_1;
+  	QM0_1 = IV2_1;
+
 
   	//Initialization 
-  	QM3_1 = IV1_1;  QM0_1 = IV2_1;
-  	QM1_1 = IV3_1;  QM2_1 = IV4_1;
+  	QM3 = 0x477de140;
+  	QM2 = 0x91ccbe7d;
+  	QM1 = 0xaa39c6a3;
+  	QM0 = 0xc8f41f4c;
+
+  	QM3_1 = 0xc77de140;
+  	QM2_1 = 0x13ccbe7d;
+  	QM1_1 = 0x2c39c6a3;
+  	QM0_1 = 0x4af41f4c;
+  	
+
 
 	// Hex table
 	// 0 = 0000  1 = 0001  2 = 0010  3 = 0011
@@ -1156,8 +1186,6 @@ int block2(void){
 	    m [ 2] = RR(Q [ 3] - Q [ 2], 17) - F(Q [ 2], Q [ 1], QM0    ) - QM1     - 0x242070db;
 	    m1[ 2] = RR(Q1[ 3] - Q1[ 2], 17) - F(Q1[ 2], Q1[ 1], QM0_1  ) - QM1_1   - 0x242070db;
 
-	     printf("Round 4\n");
-
 	    if( m1[ 2] != m[ 2] )
 	    	continue; 
 
@@ -1167,8 +1195,6 @@ int block2(void){
 
 	    m [ 3] = RR(Q [ 4] - Q [ 3], 22) - F(Q [ 3], Q [ 2], Q [ 1]) - QM0     - 0xc1bdceee;
 	    m1[ 3] = RR(Q1[ 4] - Q1[ 3], 22) - F(Q1[ 3], Q1[ 2], Q1[ 1]) - QM0_1   - 0xc1bdceee;
-
-	     printf("Round 5\n");
 
 	    if( m1[ 3] != m[ 3] )
 	    	continue; 
@@ -1183,8 +1209,6 @@ int block2(void){
 
 	    if( (m1[ 4] - m[ 4]) != 0x80000000)
 	    	continue;
-	
-	    return 0;
 
 	    //  Q[6]  = ^..0 010. 1.10 ..10 11.0 1100 0101 0110
 	    // ∆Q[6]  = +000 0000 +000 0000 0000 0000 0-00 0000
@@ -1306,8 +1330,6 @@ int block2(void){
 
 	    if( (m1[15] - m[15]) != 0x00000000)
 	    	continue;
-
-	    return 0;
 	
 
 	    // For each Q[i]:
@@ -1637,6 +1659,9 @@ int block2(void){
 		Q [60] = II(Q [56], Q [59], Q [58], Q [57], m [13],  21, 0x4e0811a1);
 		Q1[60] = II(Q1[56], Q1[59], Q1[58], Q1[57], m1[13],  21, 0x4e0811a1);
 
+		printf("2^%2.2lf iterations\n", log(i)/log(2));
+		printf("Round 60\n");
+
 		if ( bit(Q[60],32) == bit(Q[58],32) )
 			continue;
 
@@ -1647,25 +1672,79 @@ int block2(void){
 		Q [61] = II(Q [57], Q [60], Q [59], Q [58], m [ 4],  6, 0xf7537e82);
 		Q1[61] = II(Q1[57], Q1[60], Q1[59], Q1[58], m1[ 4],  6, 0xf7537e82);
 
+		printf("Round 61\n");
+
 		if ( bit(Q[61],32) != bit(Q[59],32) ) 
+	    	continue;
+
+	    if ( (Q1[61] - Q[61]) != 0x80000000 ) 
 	    	continue;
 
 	    // Q[62] = m... .... .... .... .... .... .... ....
 		Q [62] = II(Q [58], Q [61], Q [60], Q [59], m [11], 10, 0xbd3af235);
 		Q1[62] = II(Q1[58], Q1[61], Q1[60], Q1[59], m1[11], 10, 0xbd3af235);
 
+		printf("Round 62\n");
+
 		if( bit(Q[62],32) != bit(Q[60],32) )
 			continue;
 
 		// Q[63] = m... .... .... .... .... .... .... ....
 		Q [63] = II(Q [59], Q [62], Q [61], Q [60], m [ 2], 15, 0x2ad7d2bb);
-		Q1[63] = II(Q1[59], Q1[62], Q1[61], Q1[60], m1[ 2], 15, 0x2ad7d2bb);		
+		Q1[63] = II(Q1[59], Q1[62], Q1[61], Q1[60], m1[ 2], 15, 0x2ad7d2bb);
+
+		printf("Round 63\n");		
 
 		if( bit(Q[63],32) != bit(Q[61],32) )
 			continue;
 
 		Q [64] = II(Q [60], Q [63], Q [62], Q [61], m [ 9], 21, 0xeb86d391);
 		Q1[64] = II(Q1[60], Q1[63], Q1[62], Q1[61], m1[ 9], 21, 0xeb86d391);
+
+		printf("Found it in 2^%2.2lf iterations\n\n", log(i)/log(2));
+
+		QM3_1 = QM3 + Q1[61];
+		QM3   = QM3 + Q [61];
+
+		QM2_1 = QM2 + Q1[62];
+		QM2   = QM2 + Q [62];
+
+		QM1_1 = QM1 + Q1[63];
+		QM1   = QM1 + Q [63];
+
+		QM0_1 = QM0 + Q1[64];
+		QM0   = QM0 + Q [64];
+
+		IV1 = QM3;
+		IV2 = QM0;
+		IV3 = QM1;
+		IV4 = QM2;
+
+		IV1_1 = QM3_1; 
+		IV2_1 = QM0_1;
+		IV3_1 = QM1_1;
+		IV4_1 = QM2_1;
+
+		if(DEBUG){
+	    	printf("Printing ∆Q[i] to check if it follows the differential path\n");
+	    	printf("PRINTING BSDR: ∆Q[i]: \n");
+	    	for(int i = 1; i < 35; i++){
+	    		printf("∆Q[%2d]:  ",i);
+	    		printf_bsdr(Q1[i],Q[i]);
+	    	}
+	    	for(int i = 35; i < 65; i++){
+	    		printf("δQ[%2d]:  ",i);
+	    		printf_bsdr(Q1[i]-Q[i], 0x00000000);
+	    	}
+	    	printf("\n");
+	    }
+
+	    printf_bsdr(QM3_1, QM3);
+		printf_bsdr(QM2_1, QM2);
+		printf_bsdr(QM1_1, QM1);
+		printf_bsdr(QM0_1, QM0);
+
+		return 0;
 
 
 	} // End While
@@ -1689,6 +1768,7 @@ int main (void){
 	seed32_1 = rand();
 	seed32_2 = rand() % 162287;
 
+/*
 	printf("Starting first block computation\n");
 	printf("IV1 = %x\n", IV1 );
 	printf("IV2 = %x\n", IV2 );
@@ -1700,7 +1780,25 @@ int main (void){
 	cpu_time_used = ((double) (end_t - start_t)) / CLOCKS_PER_SEC;
 	printf("Block 1 found in %lf seconds\n", cpu_time_used  );
 
-/*
+
+	printf("IV1 = %x\n", IV1 );
+	printf("IV2 = %x\n", IV2 );
+	printf("IV3 = %x\n", IV3 );
+	printf("IV4 = %x\n", IV4 );
+
+	printf("IV1_1 = %x\n", IV1_1 );
+	printf("IV2_1 = %x\n", IV2_1 );
+	printf("IV3_1 = %x\n", IV3_1 );
+	printf("IV4_1 = %x\n", IV4_1 );
+
+*/	start_t = clock();
+	printf("Starting second block computation\n");
+	block2();
+
+	end_t = clock();
+	cpu_time_used = ((double) (end_t - start_t)) / CLOCKS_PER_SEC;
+	printf("Block 2 found in %lf seconds\n", cpu_time_used  );
+
 	printf("IV1 = %x\n", IV1 );
 	printf("IV2 = %x\n", IV2 );
 	printf("IV3 = %x\n", IV3 );
@@ -1712,8 +1810,6 @@ int main (void){
 	printf("IV4_1 = %x\n", IV4_1 );
 
 
-	printf("Starting second block computation\n");
-	block2();*/
 	
 	return 0;
 }
