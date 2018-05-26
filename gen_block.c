@@ -211,7 +211,7 @@ int block(void){
 
 
 
-/*		if(i%1000000 == 0){
+		if(i > 1e8){
 			printf("\n");
 			printf("Total iterations: %ld\n", i );
 			printf("Reached round 17: %d\n" , round17);
@@ -223,7 +223,7 @@ int block(void){
 			printf("Reach round48/total percent:   %8.8lf%%\n\n" , (double)(round48)/i*100);
 			printf("Reach round61/total percent:   %8.8lf%%\n\n" , (double)(round61)/i*100);
 			return 0;
-		}*/
+		}
 		i++;
 
 
@@ -1119,21 +1119,31 @@ int block2(void){
 
   	uint64_t i = 1;
   	uint64_t j = 0;
-  	int round50 = 0;
+
   	int round17 = 0;
+  	int round25 = 0;
+  	int round48 = 0;
+  	int round61 = 0;
+
+  	int cont    = 0;
 
 	while(1){
 
 
 
-/*		if(i%100000000 == 0){
-		printf("\n");
-		printf("Reach round17: %d\n", round17);
-		printf("Reach round50: %d\n", round50);
-		printf("%8.8lf\n", (double)(j)/round17*100);
-		printf("Reach round 50 percent: %8.8lf\n\n", (double)(round50)/round17*100);
+		if(i%100000000 == 0){
+			printf("\n");
+			printf("Total iterations: %ld\n", i );
+			printf("Reached round 17: %d\n" , round17);
+			printf("Reached round 25: %d\n" , round25);
+			printf("Reach round48:    %d\n" , round48);
+			printf("Reach round61:    %d\n" , round61);
+			printf("Reach round17/total percent:   %8.8lf%%\n\n" , (double)(round17)/i*100);
+			printf("Reach round25/total percent:   %8.8lf%%\n\n" , (double)(round25)/i*100);
+			printf("Reach round48/total percent:   %8.8lf%%\n\n" , (double)(round48)/i*100);
+			printf("Reach round61/total percent:   %8.8lf%%\n\n" , (double)(round61)/i*100);
 			return 0;
-		}*/
+		}
 		i++;
 
 
@@ -1330,6 +1340,8 @@ int block2(void){
 
 	    if( (m1[15] - m[15]) != 0x00000000)
 	    	continue;
+
+	    round17++;
 	
 
 	    // For each Q[i]:
@@ -1392,6 +1404,8 @@ int block2(void){
 
 	    if( !bit(Q[24],32) )
 	    	continue; 
+
+	    round25++;
 
 	    // No bitconditions for Q[25]...Q[47]
 	    Q [25] = GG(Q [21], Q [24], Q [23], Q [22], m [ 9],  5, 0x21e1cde6);
@@ -1533,6 +1547,8 @@ int block2(void){
 	    if ( (Q1[47] - Q[47]) != 0x80000000 ) 
 	    	continue;
 
+	    round48++;
+
 	    // Q[48] = m... .... .... .... .... .... .... ....
 	    Q [48] = HH(Q [44], Q [47], Q [46], Q [45], m [ 2], 23, 0xc4ac5665);
 	    Q1[48] = HH(Q1[44], Q1[47], Q1[46], Q1[45], m1[ 2], 23, 0xc4ac5665);
@@ -1556,8 +1572,6 @@ int block2(void){
 	    // Q[50] = #... .... .... .... .... .... .... ....
 		Q [50] = II(Q [46], Q [49], Q [48], Q [47], m [ 7], 10, 0x432aff97);
 		Q1[50] = II(Q1[46], Q1[49], Q1[48], Q1[47], m1[ 7], 10, 0x432aff97);
-
-		round50++;
 
 		if ( bit(Q[50],32) == bit(Q[48],32) )
 			continue;
@@ -1667,6 +1681,8 @@ int block2(void){
 
 		if ( (Q1[60] - Q[60]) != 0x80000000 ) 
 	    	continue;
+
+	    round61++;
 
 	    // Q[61] = m... .... .... .... .... .... .... ....
 		Q [61] = II(Q [57], Q [60], Q [59], Q [58], m [ 4],  6, 0xf7537e82);
@@ -1790,8 +1806,8 @@ int main (void){
 	printf("IV2_1 = %x\n", IV2_1 );
 	printf("IV3_1 = %x\n", IV3_1 );
 	printf("IV4_1 = %x\n", IV4_1 );
-
-*/	start_t = clock();
+*/
+	start_t = clock();
 	printf("Starting second block computation\n");
 	block2();
 
